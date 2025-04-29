@@ -7,13 +7,10 @@ class MenuTabelas {
         }
 
         // Se o usuário já viu as tabelas e enviou uma entrada, processa a escolha
-        if (state.currentMenu === 'tabelas' && userInput && state.hasSeenTable) {
+        if (state.currentMenu === 'tabelas' && userInput) {
             return this.processUserChoice(userInput, state);
         }
-
-        // Marca que o usuário viu a tabela
-        state.hasSeenTable = true;
-        // Mostra o menu de tabelas
+        
         return this.getMenu();
     }
 
@@ -23,48 +20,29 @@ class MenuTabelas {
         // Baseado na escolha do usuário, retorna o documento apropriado
         switch(option) {
             case 1:
+                this.resetState(state)
+                state.hasShownWelcome = false;
                 // Retorna um array de objetos de documento
                 return [
                     this.getPdfDocument("PME/PME BELO HORIZONTE 30 A 99 VIDAS.pdf", "Tabela: *_PME Belo Horizonte - 30 a 99 pessoas._*"),
                     this.getPdfDocument("PME/SUPER SIMPLES BH 2 A 29 VIDAS.pdf", "Tabela: *_SUPER SIMPLES Belo Horizonte - 2 a 29 pessoas._*"),
                     this.getPdfDocument("PF/AMBULATORIAL BELO HORIZONTE.pdf", "Tabela: *_AMBULATORIAL Belo Horizonte_*"),
                     this.getPdfDocument("PF/INDIVIDUAL COMPLETO BELO HORIZONTE.pdf", "Tabela: *_INDIVIDUAL COMPLETO Belo Horizonte_*"),
-                    {text: (this.formatMenu(
-                        {
-                            title: "*_O que deseja agora?_*",
-                            options: {
-                                1: "Belo Horizonte",
-                                2: "Triângulo Mineiro",
-                                'Q': "Voltar ao menu principal"
-                            }
-                        })) + "\n\n Escolha o número do tabela que deseja visualizar ou digite 'Q' para voltar ao menu principal."
-                    }
+                    {text: '_Atendimento Encerrado_ \n👋 Obrigado por usar nossos serviços. Até logo!'}
                 ];
                 
             case 2:
-                // Marca que enviamos todos os documentos ao usuário
-                state.sentAllDocuments = true;
-
+                this.resetState(state)
+                state.hasShownWelcome = false;
                 // Retorna um array de objetos de documento
                 return [
                     this.getPdfDocument("PME/PME TRIANGULO MINEIRO 30 A 99 VIDAS.pdf", "Tabela: *_PME Triângulo Mineiro - 30 a 99 pessoas._*"),
                     this.getPdfDocument("PME/SUPER SIMPLES TRIANGULO MINEIRO 2 A 29 VIDAS.pdf", "Tabela: *_SUPER SIMPLES Triângulo Mineiro- 2 a 29 pessoas._*"),
                     this.getPdfDocument("PF/AMBULATORIAL UBERABA E UBERLANDIA.pdf", "Tabela: *_AMBULATORIAL Uberaba e Uberlandia_*"),
                     this.getPdfDocument("PF/INDIVIDUAL COMPLETO UBERABA E UBERLANDIA.pdf", "Tabela: *_INDIVIDUAL COMPLETO Uberaba e Uberlandia_*"),
-                    {text: (this.formatMenu(
-                        {
-                            title: "*_O que deseja agora?_*",
-                            options: {
-                                1: "Belo Horizonte",
-                                2: "Triângulo Mineiro",
-                                'Q': "Voltar ao menu principal"
-                            }
-                        })) + "\n\n Escolha o número do tabela que deseja visualizar ou digite 'Q' para voltar ao menu principal."
-                    }
+                    {text: '_Atendimento Encerrado_ \n👋 Obrigado por usar nossos serviços. Até logo!'}
                 ];
-                 
-            case 4:
-                return this.resetAndReturnToMain(state);
+                
             default:
                 return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" + this.getMenu();
         }
@@ -78,6 +56,16 @@ class MenuTabelas {
             fileName: filename,
             caption: `📄 ${title}\n\nDigite "Q" para voltar ao menu principal.`
         };
+    }
+
+    static resetState(state) {
+        Object.assign(state, {
+            currentMenu: 'main',
+            hasShownWelcome: true,
+            selectedCity: null,
+            previousInput: null
+        });
+        return null;
     }
 
     static resetAndReturnToMain(state) {
