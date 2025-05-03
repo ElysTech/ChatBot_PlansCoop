@@ -1,6 +1,6 @@
 // menu.js
 const MENU_MODULES = {
-    1: { path: './menuCalcularCotacao', name: 'cotacao' },
+    1: { path: './menuCotacao', name: 'cotacao' },
     2: { path: './menuTabelas', name: 'tabelas' },
     3: { path: './menuSuporte', name: 'suporte' },
     4: { path: './menuTreinamento', name: 'treinamento' },
