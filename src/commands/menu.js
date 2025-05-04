@@ -85,7 +85,7 @@ class Menu {
             try {
                 const module = require(menuModule.path);
                 state.currentMenu = menuModule.name;
-                return module.getMenu();
+                return module.getMenu(state);
             } catch (error) {
                 console.error('Erro ao carregar módulo:', error);
                 return "⚠️ Desculpe, esta opção está temporariamente indisponível.";

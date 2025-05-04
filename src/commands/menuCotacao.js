@@ -8,7 +8,7 @@ class MenuCotacao {
             state.cliente = {};
         }
 
-        const cliente = state.cliente;
+        let cliente = state.cliente;
         const lowerCaseUserInput = userInput.toLowerCase();
 
         // Voltar ao menu principal se digitar 'q'
@@ -274,8 +274,6 @@ class MenuCotacao {
                             "Um de nossos consultores entrará em contato em breve!\n\n" +
                             "Digite 'Q' para voltar ao menu principal.";
             
-            // Reinicia o estado para uma nova cotação
-            this.resetState(state);
             return mensagem;
         } else if (userInput.toLowerCase() === 'n') {
             // Volta para o início do processo de cotação
@@ -583,9 +581,9 @@ class MenuCotacao {
     }
 
     // Menu inicial de cotação
-    static getMenu() {
-        state.cliente.lastQuestion = 'peopleType';
-        
+    static getMenu(state) {
+        state.cliente = {}; // Limpa o objeto cliente
+        state.cliente.lastQuestion = 'peopleType'
         return "📈 *_Iniciando Cotação: Responda as perguntas a seguir_*\n _Digite *'Q'* a qualquer momento para voltar ao menu principal_ \n\nPara qual tipo de pessoa deseja a cotação?\n\n 1 - Pessoa Física (PF)\n 2 - Pessoa Jurídica (PJ/PME)";
     }
 }
