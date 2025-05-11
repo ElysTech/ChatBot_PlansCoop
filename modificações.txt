@@ -1,3 +1,0 @@
-! Caminho do arquivo do menu Cotação
-    [./menuCalcularCotacao] -> [./mod_cotacao/menuCotacao.js]
-

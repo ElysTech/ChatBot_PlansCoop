@@ -1,7 +1,4 @@
-// menuCotacao.js
-// Módulo para cotação de planos de saúde
-
-class MenuCotacao {
+class CotacaoPF {
     static async execute(userInput, state) {
         // Inicializa o objeto de cliente no estado se não existir
         if (!state.cliente) {
@@ -20,25 +17,34 @@ class MenuCotacao {
         // Se for primeira interação, exibe menu principal de cotação
         if (!cliente.lastQuestion) {
             cliente.lastQuestion = 'peopleType'; // Definir a próxima pergunta imediatamente
-            console.log('INICIANDO COTAÇÃO');
-            
             return this.getMenu();
         }
+
+        //? A ordem de perguntas é:
+            //? 1 - Tipo de pessoa
+            //? 2 - Cidade
+            //? 3 - Cobertura
+            //? 4 - Plano
+            //? 5 - Coparticipação
+            //? 6 - Acomodação (apenas para cobertura Completa)
+            //? 7 - [Assistência] (apenas para BH com cobertura Ambulatorial)
+            //? 8 - Idades
+            //? 9 - Cálculo
 
         // Processa as respostas baseado na última pergunta feita
         switch (cliente.lastQuestion) {
             case 'peopleType':
-                return this.processarTipoPessoa(lowerCaseUserInput, state);
+                return this.processarTipoPessoa(userInput, state);
             case 'cidade':
                 return this.processarCidade(lowerCaseUserInput, state);
-            case 'qtdBeneficiario':
-                return this.processarQuantidadeBeneficiarios(lowerCaseUserInput, state);
-            case 'tipoPlano':
-                return this.processarTipoPlano(lowerCaseUserInput, state);
+            case 'cobertura':
+                return this.processarCobertura(lowerCaseUserInput, state);
+            case 'plano':
+                return this.processarPlano(lowerCaseUserInput, state);
             case 'coparticipacao':
                 return this.processarCoparticipacao(lowerCaseUserInput, state);
-            case 'segmentacao':
-                return this.processarSegmentacao(lowerCaseUserInput, state);
+            case 'assistencia':
+                return this.processarAssistencia(lowerCaseUserInput, state);
             case 'acomodacao':
                 return this.processarAcomodacao(lowerCaseUserInput, state);
             case 'idades':
@@ -50,162 +56,177 @@ class MenuCotacao {
         }
     }
 
-    // Removido o método iniciarCotacao que estava causando a duplicação
-
-    // Processa a escolha do tipo de pessoa (PF ou PJ)
+    // Processa o tipo de pessoa
     static processarTipoPessoa(userInput, state) {
         const cliente = state.cliente;
         
-        switch (userInput) {
-            case '1':
-                cliente.peopleType = 'PF';
-                cliente.lastQuestion = 'cidade';
-                return "Para qual cidade deseja a cotação?\n\n 1 - Belo Horizonte\n 2 - Triângulo Mineiro";
-            case '2':
-                cliente.peopleType = 'PJ';
-                cliente.lastQuestion = 'cidade';
-                return "Para qual cidade deseja a cotação?\n\n 1 - Belo Horizonte\n 2 - Triângulo Mineiro";
-            default:
-                return "⚠️ Opção inválida. Por favor, escolha 1 para Pessoa Física ou 2 para Pessoa Jurídica.";
+        if (userInput === '1') {
+            cliente.peopleType = 'PF';
+            cliente.lastQuestion = 'cidade';
+            return "Para qual cidade deseja a cotação?\n\n 1 - Belo Horizonte\n 2 - Triângulo Mineiro";
+        } else if (userInput === '2') {
+            cliente.peopleType = 'PJ';
+            cliente.lastQuestion = 'cidade';
+            return "Para qual cidade deseja a cotação?\n\n 1 - Belo Horizonte\n 2 - Triângulo Mineiro";
+        } else {
+            return "⚠️ Opção inválida. Por favor, escolha 1 para PF ou 2 para PJ.";
         }
     }
 
-    // Processa a escolha da cidade
+    // Processa a escolha da cidade e pergunta a cobertura
     static processarCidade(userInput, state) {
         const cliente = state.cliente;
-        
+
         switch (userInput) {
             case '1':
                 cliente.cidade = 'Belo Horizonte';
-                cliente.lastQuestion = 'qtdBeneficiario';
-                return this.perguntarQuantidadeBeneficiarios(cliente);
+                cliente.lastQuestion = 'cobertura';
+                return "Qual cobertura deseja?\n\n 1 - Ambulatorial\n 2 - Completo";
             case '2':
                 cliente.cidade = 'Triângulo Mineiro';
-                cliente.lastQuestion = 'qtdBeneficiario';
-                return this.perguntarQuantidadeBeneficiarios(cliente);
+                cliente.lastQuestion = 'cobertura';
+                return "Qual cobertura deseja?\n\n 1 - Ambulatorial\n 2 - Completo";
             default:
                 return "⚠️ Opção inválida. Por favor, escolha 1 para Belo Horizonte ou 2 para Triângulo Mineiro.";
         }
     }
 
-    // Formulário para quantidade de beneficiários baseado no tipo de pessoa
-    static perguntarQuantidadeBeneficiarios(cliente) {
-        if (cliente.peopleType === 'PJ') {
-            return "Qual a quantidade de beneficiários?\n\n 1 - 2 a 29 pessoas\n 2 - 30 a 99 pessoas";
-        } else {
-            // Para PF, vamos direto para o tipo de plano
-            cliente.qtdBeneficiario = '1';
-            cliente.lastQuestion = 'tipoPlano';
-            return "Qual plano deseja contratar?\n\n 1 - Nosso Plano\n 2 - Nosso Médico";
-        }
-    }
-
-    // Processa a quantidade de beneficiários
-    static processarQuantidadeBeneficiarios(userInput, state) {
+    // Processa a escolha da cobertura e pergunta o plano
+    static processarCobertura(userInput, state) {
         const cliente = state.cliente;
-        
+
         switch (userInput) {
-            case '1':
-                cliente.qtdBeneficiario = '2-29';
-                cliente.lastQuestion = 'tipoPlano';
-                return "Qual plano deseja contratar?\n\n 1 - Nosso Plano\n 2 - Nosso Médico";
-            case '2':
-                cliente.qtdBeneficiario = '30-99';
-                cliente.lastQuestion = 'tipoPlano';
-                return "Qual plano deseja contratar?\n\n 1 - Nosso Plano\n 2 - Nosso Médico";
+            case '1': // COBERTURA AMBULATORIAL
+                cliente.cobertura = 'Ambulatorial';
+                cliente.segmentacao = 'AMB'; // Define segmentação para tabela de preços
+                cliente.acomodacao = 'S/ACOM'; // Define acomodação padrão para ambulatorial
+                cliente.lastQuestion = 'plano';
+
+                if (cliente.cidade === 'Belo Horizonte') {
+                    return "Qual plano deseja?\n\n 1 - Nosso Plano\n 2 - Plano Odontológico";
+                } else if (cliente.cidade === 'Triângulo Mineiro') {
+                    return "Qual plano deseja?\n\n 1 - Nosso Plano";
+                }
+                break;
+
+            case '2': // COBERTURA COMPLETO
+                cliente.cobertura = 'Completo';
+                cliente.segmentacao = 'AMB+HOSP+OBST'; // Define segmentação para tabela de preços
+                cliente.lastQuestion = 'plano';
+
+                if (cliente.cidade === 'Belo Horizonte') {
+                    return "Qual plano deseja?\n\n 1 - Nosso Plano & Nosso Médico\n 2 - Plano Odontológico";
+                } else if (cliente.cidade === 'Triângulo Mineiro') {
+                    return "Qual plano deseja?\n\n 1 - Nosso Plano & Nosso Médico\n 2 - Plano Odontológico";
+                }
+                break;
+
             default:
-                return "⚠️ Opção inválida. Por favor, escolha 1 para 2-29 pessoas ou 2 para 30-99 pessoas.";
+                return "⚠️ Opção inválida. Por favor, escolha 1 para Ambulatorial ou 2 para Completo.";
         }
     }
 
-    // Processa o tipo de plano
-    static processarTipoPlano(userInput, state) {
+    // Processa a escolha do plano e pergunta a coparticipação
+    static processarPlano(userInput, state) {
         const cliente = state.cliente;
-        
-        switch (userInput) {
-            case '1':
+
+        // SE FOR PLANO ODONTOLÓGICO, RETORNA O VALOR E FINALIZA
+        if (userInput === '2') {
+            cliente.plano = 'Plano Odontológico';
+            
+            let valorPlano = 0;
+            if (cliente.cidade === 'Belo Horizonte') {
+                valorPlano = cliente.cobertura === 'Ambulatorial' ? 18.54 : 73.03;
+            } else if (cliente.cidade === 'Triângulo Mineiro') {
+                valorPlano = cliente.cobertura === 'Ambulatorial' ? 18.54 : 73.03;
+            }
+            
+            this.resetState(state);
+            return [
+                {text: `O valor do plano odontológico, em ${cliente.cidade} com cobertura ${cliente.cobertura.toLowerCase()}, é de R$ ${valorPlano.toFixed(2)} ao mês por pessoa.`},
+                {text: "Seu atendimento está sendo encerrado. Você pode enviar uma mensagem e iniciar um atendimento quando quiser.\n\n👋 Obrigado por utilizar nossos serviços. Até mais!"},
+            ];
+        }
+
+        // PROCESSA ESCOLHA DE PLANO NORMAL
+        if (userInput === '1') {
+            if (cliente.cobertura === 'Ambulatorial') {
+                cliente.plano = 'Nosso Plano';
                 cliente.tipoPlano = 'Nosso Plano';
-                cliente.lastQuestion = 'coparticipacao';
-                return "Qual tipo de coparticipação?\n\n 1 - Com Coparticipação (Total)\n 2 - Com Coparticipação Parcial";
-            case '2':
-                cliente.tipoPlano = 'Nosso Médico';
-                cliente.lastQuestion = 'coparticipacao';
-                return "Qual tipo de coparticipação?\n\n 1 - Com Coparticipação (Total)\n 2 - Com Coparticipação Parcial";
-            default:
-                return "⚠️ Opção inválida. Por favor, escolha 1 para Nosso Plano ou 2 para Nosso Médico.";
+            } else if (cliente.cobertura === 'Completo') {
+                cliente.plano = 'Nosso Plano & Nosso Médico';
+                cliente.tipoPlano = 'Nosso Médico'; // Para a tabela de preços
+            }
+            
+            // PERGUNTA A COPARTICIPAÇÃO
+            cliente.lastQuestion = 'coparticipacao';
+            return "Qual a coparticipação desejada?\n\n 1 - Total\n 2 - Parcial";
+        } else {
+            return "⚠️ Opção inválida. Por favor, escolha uma opção válida.";
         }
     }
 
-    // Processa a coparticipação
+    // Processa a coparticipação e determina próxima pergunta
     static processarCoparticipacao(userInput, state) {
         const cliente = state.cliente;
         
-        switch (userInput) {
-            case '1':
-                cliente.coparticipacao = 'Total';
-                cliente.lastQuestion = 'segmentacao';
-                return this.perguntarSegmentacao(cliente);
-            case '2':
-                cliente.coparticipacao = 'Parcial';
-                cliente.lastQuestion = 'segmentacao';
-                return this.perguntarSegmentacao(cliente);
-            default:
-                return "⚠️ Opção inválida. Por favor, escolha 1 para Coparticipação Total ou 2 para Coparticipação Parcial.";
+        // Processa a coparticipação
+        if (userInput === '1') {
+            cliente.coparticipacao = 'Total';
+        } else if (userInput === '2') {
+            cliente.coparticipacao = 'Parcial';
+        } else {
+            return "⚠️ Opção inválida. Por favor, escolha 1 para Total ou 2 para Parcial.";
         }
-    }
 
-    // Pergunta sobre a segmentação com base no tipo de plano
-    static perguntarSegmentacao(cliente) {
-        if (cliente.tipoPlano === 'Nosso Médico') {
-            // Nosso Médico só tem uma opção de segmentação
-            cliente.segmentacao = 'AMB+HOSP+OBST';
+        // LÓGICA DE FLUXO: ASSISTÊNCIA OU ACOMODAÇÃO OU DIRETO PARA IDADES
+        if (cliente.cidade === 'Belo Horizonte' && cliente.cobertura === 'Ambulatorial') {
+            // Para BH com plano ambulatorial, pergunta sobre assistência
+            cliente.lastQuestion = 'assistencia';
+            return "Qual a assistência desejada?\n\n 1 - Médico 1\n 2 - Médico 2";
+        } else if (cliente.cobertura === 'Completo') {
+            // Para cobertura completa, pergunta sobre acomodação
             cliente.lastQuestion = 'acomodacao';
-            return "Qual acomodação deseja?\n\n 1 - Enfermaria\n 2 - Apartamento";
-        } else if (cliente.tipoPlano === 'Nosso Plano') {
-            // Nosso Plano tem duas opções
-            return "Qual segmentação deseja?\n\n 1 - AMB (Ambulatorial)\n 2 - AMB+HOSP+OBST (Ambulatorial+Hospitalar+Obstetrícia)";
+            return "Qual a acomodação?\n\n 1 - Enfermaria\n 2 - Apartamento";
+        } else {
+            // Para outros casos, pergunta direto as idades
+            cliente.lastQuestion = 'idades';
+            return "Digite as idades dos beneficiários separadas por vírgula (exemplo: 30,45,12):";
         }
     }
-
-    // Processa a segmentação
-    static processarSegmentacao(userInput, state) {
+    
+    // Processa a assistência e pergunta as idades
+    static processarAssistencia(userInput, state) {
         const cliente = state.cliente;
         
-        if (cliente.tipoPlano === 'Nosso Plano') {
-            switch (userInput) {
-                case '1':
-                    cliente.segmentacao = 'AMB';
-                    cliente.lastQuestion = 'acomodacao';
-                    // Para AMB, só existe S/ACOM
-                    cliente.acomodacao = 'S/ACOM';
-                    cliente.lastQuestion = 'idades';
-                    return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
-                case '2':
-                    cliente.segmentacao = 'AMB+HOSP+OBST';
-                    cliente.lastQuestion = 'acomodacao';
-                    return "Qual acomodação deseja?\n\n 1 - Enfermaria\n 2 - Apartamento";
-                default:
-                    return "⚠️ Opção inválida. Por favor, escolha 1 para AMB ou 2 para AMB+HOSP+OBST.";
-            }
+        if (userInput === '1') {
+            cliente.assistencia = 'Médico 1';
+        } else if (userInput === '2') {
+            cliente.assistencia = 'Médico 2';
+        } else {
+            return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1 ou 2 para Médico 2.";
         }
+        
+        // Próxima pergunta: idades
+        cliente.lastQuestion = 'idades';
+        return "Digite as idades dos beneficiários separadas por vírgula (exemplo: 30,45,12):";
     }
-
-    // Processa a acomodação
+    
+    // Processa a acomodação e pergunta as idades
     static processarAcomodacao(userInput, state) {
         const cliente = state.cliente;
         
-        switch (userInput) {
-            case '1':
-                cliente.acomodacao = 'ENFERM';
-                cliente.lastQuestion = 'idades';
-                return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
-            case '2':
-                cliente.acomodacao = 'APART';
-                cliente.lastQuestion = 'idades';
-                return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
-            default:
-                return "⚠️ Opção inválida. Por favor, escolha 1 para Enfermaria ou 2 para Apartamento.";
+        if (userInput === '1') {
+            cliente.acomodacao = 'ENFERM';
+        } else if (userInput === '2') {
+            cliente.acomodacao = 'APART';
+        } else {
+            return "⚠️ Opção inválida. Por favor, escolha 1 para Enfermaria ou 2 para Apartamento.";
         }
+        
+        // Próxima pergunta: idades
+        cliente.lastQuestion = 'idades';
+        return "Digite as idades dos beneficiários separadas por vírgula (exemplo: 30,45,12):";
     }
 
     // Processa as idades e calcula o valor total
@@ -238,15 +259,19 @@ class MenuCotacao {
             let mensagem = "*📊 RESULTADO DA COTAÇÃO:*\n\n";
             mensagem += `*Tipo de Pessoa:* ${cliente.peopleType === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}\n`;
             mensagem += `*Cidade:* ${cliente.cidade}\n`;
-            if (cliente.peopleType === 'PJ') {
-                mensagem += `*Quantidade:* ${cliente.qtdBeneficiario} pessoas\n`;
-            }
-            mensagem += `*Plano:* ${cliente.tipoPlano}\n`;
+            mensagem += `*Plano:* ${cliente.plano}\n`;
+            mensagem += `*Cobertura:* ${cliente.cobertura}\n`;
             mensagem += `*Coparticipação:* ${cliente.coparticipacao}\n`;
-            mensagem += `*Segmentação:* ${cliente.segmentacao}\n`;
-            mensagem += `*Acomodação:* ${cliente.acomodacao}\n\n`;
             
-            mensagem += "*Detalhamento por idade:*\n";
+            if (cliente.cobertura === 'Completo') {
+                mensagem += `*Acomodação:* ${cliente.acomodacao === 'ENFERM' ? 'Enfermaria' : 'Apartamento'}\n`;
+            }
+            
+            if (cliente.cidade === 'Belo Horizonte' && cliente.cobertura === 'Ambulatorial') {
+                mensagem += `*Assistência:* ${cliente.assistencia}\n`;
+            }
+            
+            mensagem += "\n*Detalhamento por idade:*\n";
             cliente.detalhamento.forEach(item => {
                 mensagem += `${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
             });
@@ -269,7 +294,7 @@ class MenuCotacao {
             // Lógica para salvar a cotação poderia ser implementada aqui
             const mensagem = "*✅ COTAÇÃO FINALIZADA COM SUCESSO!*\n\n" +
                             `Cotação para ${cliente.peopleType === 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica'}\n` +
-                            `Plano ${cliente.tipoPlano} - ${cliente.segmentacao}\n` +
+                            `Plano ${cliente.plano} - ${cliente.cobertura}\n` +
                             `Valor Total: R$ ${cliente.valorTotal.toFixed(2)}\n\n` +
                             "Um de nossos consultores entrará em contato em breve!\n\n" +
                             "Digite 'Q' para voltar ao menu principal.";
@@ -277,7 +302,8 @@ class MenuCotacao {
             return mensagem;
         } else if (userInput.toLowerCase() === 'n') {
             // Volta para o início do processo de cotação
-            return "Cotação cancelada. Digite 'Q' para voltar ao menu principal ou qualquer tecla para iniciar uma nova cotação.";
+            this.resetState(state);
+            return "Cotação cancelada. Digite qualquer tecla para iniciar uma nova cotação.";
         } else {
             return "⚠️ Opção inválida. Por favor, responda com 'S' para confirmar ou 'N' para cancelar.";
         }
@@ -298,9 +324,6 @@ class MenuCotacao {
             if (!tabela) {
                 throw new Error("Não foi possível obter a tabela de preços");
             }
-            
-            // Verifica se a tabela foi obtida corretamente
-            console.log("Tabela obtida:", JSON.stringify(tabela));
             
             // Calcula o valor para cada idade
             for (const idadeStr of cliente.idades) {
@@ -366,10 +389,7 @@ class MenuCotacao {
 
     // Obtém a tabela de preços com base nas opções selecionadas pelo cliente
     static obterTabelaPrecos(cliente) {
-        // Esta função emula a consulta à tabela de preços conforme mostrada na imagem
-        // Na implementação real, esses valores poderiam vir de um banco de dados ou arquivo de configuração
-        
-        // Tabela de preços baseada na imagem fornecida
+        // Tabela de preços
         const tabelaPrecos = {
             'Nosso Plano': {
                 'Total': {
@@ -518,7 +538,7 @@ class MenuCotacao {
         };
         
         try {
-            // Verificação de segurança para garantir que todos os dados necessários estão presentes
+            // Log para depuração
             console.log(`DEBUG: Acessando tabela com - Plano: ${cliente.tipoPlano}, Copart: ${cliente.coparticipacao}, Segm: ${cliente.segmentacao}, Acom: ${cliente.acomodacao}`);
             
             // Verifica se o plano existe na tabela
@@ -573,7 +593,7 @@ class MenuCotacao {
     static resetState(state) {
         Object.assign(state, {
             currentMenu: 'main',
-            hasShownWelcome: true,
+            hasShownWelcome: false,
             selectedCity: null,
             previousInput: null,
             cliente: {} // Reset do objeto cliente
@@ -581,11 +601,9 @@ class MenuCotacao {
     }
 
     // Menu inicial de cotação
-    static getMenu(state) {
-        state.cliente = {}; // Limpa o objeto cliente
-        state.cliente.lastQuestion = 'peopleType'
+    static getMenu() {
         return "📈 *_Iniciando Cotação: Responda as perguntas a seguir_*\n _Digite *'Q'* a qualquer momento para voltar ao menu principal_ \n\nPara qual tipo de pessoa deseja a cotação?\n\n 1 - Pessoa Física (PF)\n 2 - Pessoa Jurídica (PJ/PME)";
     }
 }
 
-module.exports = MenuCotacao;
+module.exports = CotacaoPF;

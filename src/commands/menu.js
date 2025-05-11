@@ -1,12 +1,11 @@
 // menu.js
 const MENU_MODULES = {
-    1: { path: './menuCotacao', name: 'cotacao' },
+    1: { path: './menuCotacao/menuCotacao', name: 'cotacao' },
     2: { path: './menuTabelas', name: 'tabelas' },
     3: { path: './menuSuporte', name: 'suporte' },
     4: { path: './menuTreinamento', name: 'treinamento' },
     5: { path: './menuCadastroParceiro', name: 'parceiro' },
     6: { path: './menuPremiacoes', name: 'premiacoes' },
-    
 };
 
 class Menu {
