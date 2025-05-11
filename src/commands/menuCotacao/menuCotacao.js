@@ -13,8 +13,6 @@ class MenuCotacao {
         let cliente = state.cliente;
         const lowerCaseUserInput = userInput.toLowerCase();
 
-
-
         // Voltar ao menu principal se digitar 'q'
         if (lowerCaseUserInput === 'q') {
             this.resetState(state);
@@ -57,6 +55,8 @@ class MenuCotacao {
                     return this.processarSegmentacao(lowerCaseUserInput, state);
                 case 'acomodacao':
                     return this.processarAcomodacao(lowerCaseUserInput, state);
+                case 'assistencia':
+                    return this.processarAssistencia(lowerCaseUserInput, state);
                 case 'idades':
                     return this.processarIdades(lowerCaseUserInput, state);
                 case 'confirmar':
@@ -70,27 +70,6 @@ class MenuCotacao {
         } else {
             // Se o tipo de pessoa não for PF ou PJ, retorna mensagem de erro
             return "⚠️ menuCotacao.js:69 -> Ocorreu um erro. Por favor, digite 'Q' para reiniciar.";
-        }
-    }
-
-    // Removido o método iniciarCotacao que estava causando a duplicação
-
-    // Processa a escolha do tipo de pessoa (PF ou PJ)
-    static processarTipoPessoa(userInput, state) {
-        const cliente = state.cliente;
-
-        switch (userInput) {
-            case '1':
-                cliente.peopleType = 'PF';
-                cliente.lastQuestion = 'cidade';
-                //* Para PF, manda para o módulo de cotação PF
-                console.log("menuCotacao.js informa: Cliente PF selecionado, redirecionando para o módulo de cotação PF.");
-                return cotacaoPF.execute(userInput, state);
-            case '2':
-                cliente.peopleType = 'PJ';
-
-            default:
-                return "⚠️ menuCotacao.js:90 -> Opção inválida. Por favor, escolha 1 para Pessoa Física ou 2 para Pessoa Jurídica.";
         }
     }
 
@@ -202,8 +181,18 @@ class MenuCotacao {
                     cliente.lastQuestion = 'acomodacao';
                     // Para AMB, só existe S/ACOM
                     cliente.acomodacao = 'S/ACOM';
-                    cliente.lastQuestion = 'idades';
-                    return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
+                    
+                    // Verifica se precisa perguntar assistência
+                    if (cliente.cidade === 'Triângulo Mineiro' && 
+                        cliente.qtdBeneficiario === '30-99' && 
+                        cliente.coparticipacao === 'Total') {
+                        cliente.lastQuestion = 'assistencia';
+                        return "Qual a assistência desejada?\n\n 1 - Médico 1\n 2 - Médico 2";
+                    } else {
+                        cliente.lastQuestion = 'idades';
+                        return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
+                    }
+                    
                 case '2':
                     cliente.segmentacao = 'AMB+HOSP+OBST';
                     cliente.lastQuestion = 'acomodacao';
@@ -221,15 +210,67 @@ class MenuCotacao {
         switch (userInput) {
             case '1':
                 cliente.acomodacao = 'ENFERM';
-                cliente.lastQuestion = 'idades';
-                return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
+                break;
             case '2':
                 cliente.acomodacao = 'APART';
-                cliente.lastQuestion = 'idades';
-                return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
+                break;
             default:
                 return "⚠️ Opção inválida. Por favor, escolha 1 para Enfermaria ou 2 para Apartamento.";
         }
+
+        // Verifica se precisa perguntar assistência
+        if (this.devePerguntarAssistencia(cliente)) {
+            cliente.lastQuestion = 'assistencia';
+            return "Qual a assistência desejada?\n\n 1 - Médico 1\n 2 - Médico 2";
+        } else {
+            cliente.lastQuestion = 'idades';
+            return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
+        }
+    }
+
+    // Verifica se deve perguntar sobre assistência
+    static devePerguntarAssistencia(cliente) {
+        // Belo Horizonte, 30-99 vidas, após acomodação
+        if (cliente.cidade === 'Belo Horizonte' && cliente.qtdBeneficiario === '30-99') {
+            return true;
+        }
+        
+        // Triângulo Mineiro, 30-99 vidas, Nosso Médico, após acomodação
+        if (cliente.cidade === 'Triângulo Mineiro' && 
+            cliente.qtdBeneficiario === '30-99' && 
+            cliente.tipoPlano === 'Nosso Médico') {
+            return true;
+        }
+        
+        // Triângulo Mineiro, 30-99 vidas, Nosso Plano, COM COPARTICIPAÇÃO, AMB+HOSP+OBST
+        if (cliente.cidade === 'Triângulo Mineiro' && 
+            cliente.qtdBeneficiario === '30-99' && 
+            cliente.tipoPlano === 'Nosso Plano' && 
+            cliente.coparticipacao === 'Total' && 
+            cliente.segmentacao === 'AMB+HOSP+OBST') {
+            return true;
+        }
+        
+        return false;
+    }
+
+    // Processa a assistência
+    static processarAssistencia(userInput, state) {
+        const cliente = state.cliente;
+        
+        switch (userInput) {
+            case '1':
+                cliente.assistencia = 'medico 1';
+                break;
+            case '2':
+                cliente.assistencia = 'medico 2';
+                break;
+            default:
+                return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1 ou 2 para Médico 2.";
+        }
+        
+        cliente.lastQuestion = 'idades';
+        return "Informe as idades dos beneficiários separando por vírgula (exemplo: 18, 25, 30):";
     }
 
     // Processa as idades e calcula o valor total
@@ -268,9 +309,14 @@ class MenuCotacao {
             mensagem += `*Plano:* ${cliente.tipoPlano}\n`;
             mensagem += `*Coparticipação:* ${cliente.coparticipacao}\n`;
             mensagem += `*Segmentação:* ${cliente.segmentacao}\n`;
-            mensagem += `*Acomodação:* ${cliente.acomodacao}\n\n`;
-
-            mensagem += "*Detalhamento por idade:*\n";
+            mensagem += `*Acomodação:* ${cliente.acomodacao}\n`;
+            
+            // Adiciona assistência se existir
+            if (cliente.assistencia) {
+                mensagem += `*Assistência:* ${cliente.assistencia === 'medico 1' ? 'Médico 1' : 'Médico 2'}\n`;
+            }
+            
+            mensagem += "\n*Detalhamento por idade:*\n";
             cliente.detalhamento.forEach(item => {
                 mensagem += `${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
             });
@@ -401,6 +447,22 @@ class MenuCotacao {
     static obterTabelaPrecos(cliente) {
         try {
             // Para PJ, o caminho é diferente
+            // Caso tenha assistência médica, precisamos adicionar isso ao caminho
+            if (cliente.assistencia && cliente.qtdBeneficiario === '30-99') {
+                // Para casos com assistência médica
+                // Belo Horizonte ou Triângulo Mineiro, 30-99 vidas
+                if (cliente.tipoPlano === 'Nosso Médico') {
+                    // Para Nosso Médico - a estrutura já tem médico 1 e médico 2
+                    const tabela = tabelaHappyVidaPJ.PJ[cliente.cidade][cliente.qtdBeneficiario][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao][cliente.assistencia];
+                    return tabela;
+                } else if (cliente.tipoPlano === 'Nosso Plano') {
+                    // Para Nosso Plano
+                    const tabela = tabelaHappyVidaPJ.PJ[cliente.cidade][cliente.qtdBeneficiario][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao][cliente.assistencia];
+                    return tabela;
+                }
+            }
+            
+            // Caso padrão sem assistência médica
             const tabela = tabelaHappyVidaPJ.PJ[cliente.cidade][cliente.qtdBeneficiario][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao];
             
             if (!tabela) {
@@ -410,7 +472,8 @@ class MenuCotacao {
                     tipoPlano: cliente.tipoPlano,
                     coparticipacao: cliente.coparticipacao,
                     segmentacao: cliente.segmentacao,
-                    acomodacao: cliente.acomodacao
+                    acomodacao: cliente.acomodacao,
+                    assistencia: cliente.assistencia
                 });
                 return this.getTabelaFallback();
             }
