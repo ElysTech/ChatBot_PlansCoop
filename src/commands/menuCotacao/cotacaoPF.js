@@ -1,3 +1,6 @@
+// Importa a tabela de preços
+const tabelaHappyVidaPF = require('./tableHappyVidaPF');
+
 class CotacaoPF {
     static async execute(userInput, state) {
         // Inicializa o objeto de cliente no estado se não existir
@@ -129,16 +132,16 @@ class CotacaoPF {
     // Processa a escolha do plano e pergunta a coparticipação
     static processarPlano(userInput, state) {
         const cliente = state.cliente;
-
+    
         // SE FOR PLANO ODONTOLÓGICO, RETORNA O VALOR E FINALIZA
         if (userInput === '2') {
             cliente.plano = 'Plano Odontológico';
             
             let valorPlano = 0;
             if (cliente.cidade === 'Belo Horizonte') {
-                valorPlano = cliente.cobertura === 'Ambulatorial' ? 18.54 : 73.03;
+                valorPlano = tabelaHappyVidaPF[cliente.cidade][cliente.cobertura]['Planos Odontológicos'];
             } else if (cliente.cidade === 'Triângulo Mineiro') {
-                valorPlano = cliente.cobertura === 'Ambulatorial' ? 18.54 : 73.03;
+                valorPlano = tabelaHappyVidaPF[cliente.cidade]['Completo']['Planos Odontológicos'];
             }
             
             this.resetState(state);
@@ -147,7 +150,7 @@ class CotacaoPF {
                 {text: "Seu atendimento está sendo encerrado. Você pode enviar uma mensagem e iniciar um atendimento quando quiser.\n\n👋 Obrigado por utilizar nossos serviços. Até mais!"},
             ];
         }
-
+    
         // PROCESSA ESCOLHA DE PLANO NORMAL
         if (userInput === '1') {
             if (cliente.cobertura === 'Ambulatorial') {
@@ -389,184 +392,52 @@ class CotacaoPF {
 
     // Obtém a tabela de preços com base nas opções selecionadas pelo cliente
     static obterTabelaPrecos(cliente) {
-        // Tabela de preços
-        const tabelaPrecos = {
-            'Nosso Plano': {
-                'Total': {
-                    'AMB': {
-                        'S/ACOM': {
-                            '0-18': 77.81,
-                            '19-23': 81.55,
-                            '24-28': 91.34,
-                            '29-33': 105.04,
-                            '34-38': 120.80,
-                            '39-43': 143.75,
-                            '44-48': 179.69,
-                            '49-53': 224.61,
-                            '54-58': 381.84,
-                            '59+': 427.66
-                        }
-                    },
-                    'AMB+HOSP+OBST': {
-                        'ENFERM': {
-                            '0-18': 148.90,
-                            '19-23': 166.77,
-                            '24-28': 186.78,
-                            '29-33': 214.80,
-                            '34-38': 247.02,
-                            '39-43': 293.95,
-                            '44-48': 367.44,
-                            '49-53': 459.30,
-                            '54-58': 780.81,
-                            '59+': 874.51
-                        },
-                        'APART': {
-                            '0-18': 154.89,
-                            '19-23': 173.47,
-                            '24-28': 194.28,
-                            '29-33': 223.43,
-                            '34-38': 256.94,
-                            '39-43': 305.76,
-                            '44-48': 382.19,
-                            '49-53': 477.75,
-                            '54-58': 812.17,
-                            '59+': 909.03
-                        }
-                    }
-                },
-                'Parcial': {
-                    'AMB': {
-                        'S/ACOM': {
-                            '0-18': 114.85,
-                            '19-23': 128.63,
-                            '24-28': 144.07,
-                            '29-33': 165.68,
-                            '34-38': 190.53,
-                            '39-43': 226.73,
-                            '44-48': 283.41,
-                            '49-53': 354.26,
-                            '54-58': 602.24,
-                            '59+': 674.51
-                        }
-                    },
-                    'AMB+HOSP+OBST': {
-                        'ENFERM': {
-                            '0-18': 172.09,
-                            '19-23': 192.74,
-                            '24-28': 215.87,
-                            '29-33': 248.25,
-                            '34-38': 285.49,
-                            '39-43': 339.73,
-                            '44-48': 424.66,
-                            '49-53': 530.83,
-                            '54-58': 902.41,
-                            '59+': 1010.70
-                        },
-                        'APART': {
-                            '0-18': 223.32,
-                            '19-23': 250.12,
-                            '24-28': 280.13,
-                            '29-33': 322.15,
-                            '34-38': 370.47,
-                            '39-43': 440.86,
-                            '44-48': 551.06,
-                            '49-53': 688.85,
-                            '54-58': 1171.05,
-                            '59+': 1311.58
-                        }
-                    }
-                }
-            },
-            'Nosso Médico': {
-                'Total': {
-                    'AMB+HOSP+OBST': {
-                        'ENFERM': {
-                            '0-18': 200.99,
-                            '19-23': 225.11,
-                            '24-28': 252.12,
-                            '29-33': 289.94,
-                            '34-38': 333.42,
-                            '39-43': 396.77,
-                            '44-48': 495.97,
-                            '49-53': 619.97,
-                            '54-58': 1053.95,
-                            '59+': 1180.42
-                        },
-                        'APART': {
-                            '0-18': 251.24,
-                            '19-23': 281.39,
-                            '24-28': 315.14,
-                            '29-33': 362.43,
-                            '34-38': 416.77,
-                            '39-43': 495.97,
-                            '44-48': 619.97,
-                            '49-53': 774.96,
-                            '54-58': 1317.44,
-                            '59+': 1475.53
-                        }
-                    }
-                },
-                'Parcial': {
-                    'AMB+HOSP+OBST': {
-                        'ENFERM': {
-                            '0-18': 103.37,
-                            '19-23': 115.77,
-                            '24-28': 129.66,
-                            '29-33': 149.11,
-                            '34-38': 171.48,
-                            '39-43': 204.06,
-                            '44-48': 255.07,
-                            '49-53': 318.83,
-                            '54-58': 542.02,
-                            '59+': 607.06
-                        },
-                        'APART': {
-                            '0-18': 134.01,
-                            '19-23': 150.09,
-                            '24-28': 168.10,
-                            '29-33': 193.32,
-                            '34-38': 222.32,
-                            '39-43': 264.96,
-                            '44-48': 330.70,
-                            '49-53': 413.54,
-                            '54-58': 702.73,
-                            '59+': 787.06
-                        }
-                    }
-                }
-            }
-        };
-        
         try {
-            // Log para depuração
-            console.log(`DEBUG: Acessando tabela com - Plano: ${cliente.tipoPlano}, Copart: ${cliente.coparticipacao}, Segm: ${cliente.segmentacao}, Acom: ${cliente.acomodacao}`);
+            // Mapeamento das strings de coparticipação
+            const coparticipacaoMap = {
+                'Total': 'COM COPARTICIPAÇÃO',
+                'Parcial': 'COPARTICIPAÇÃO PARCIAL'
+            };
             
-            // Verifica se o plano existe na tabela
-            if (!tabelaPrecos[cliente.tipoPlano]) {
-                console.error(`Plano "${cliente.tipoPlano}" não encontrado na tabela de preços`);
+            // Para Plano Odontológico, retornar diretamente o valor
+            if (cliente.plano === 'Plano Odontológico') {
+                const valorOdonto = tabelaHappyVidaPF[cliente.cidade][cliente.cobertura]['Planos Odontológicos'];
+                return { valor: valorOdonto };
+            }
+            
+            // Determinar qual médico usar (para BH Ambulatorial)
+            let medico = '';
+            if (cliente.cidade === 'Belo Horizonte' && cliente.cobertura === 'Ambulatorial') {
+                medico = cliente.assistencia === 'Médico 1' ? 'medico 1' : 'medico 2';
+            } else if (cliente.cobertura === 'Completo') {
+                // Para Completo também tem médico 1 e 2
+                medico = 'medico 1'; // Padrão se não houver assistência definida
+            }
+            
+            // Construir o caminho para a tabela
+            const coparticipacao = coparticipacaoMap[cliente.coparticipacao];
+            let tabela;
+            
+            if (cliente.cidade === 'Triângulo Mineiro') {
+                // Triângulo Mineiro tem estrutura diferente (sem médico 1/2)
+                tabela = tabelaHappyVidaPF[cliente.cidade][cliente.cobertura][cliente.plano][coparticipacao];
+            } else {
+                // Belo Horizonte tem médico 1/2
+                tabela = tabelaHappyVidaPF[cliente.cidade][cliente.cobertura][cliente.plano][coparticipacao][medico];
+            }
+            
+            if (!tabela) {
+                console.error('Tabela não encontrada para:', {
+                    cidade: cliente.cidade,
+                    cobertura: cliente.cobertura,
+                    plano: cliente.plano,
+                    coparticipacao: coparticipacao,
+                    medico: medico
+                });
                 return this.getTabelaFallback();
             }
             
-            // Verifica se a coparticipação existe para o plano
-            if (!tabelaPrecos[cliente.tipoPlano][cliente.coparticipacao]) {
-                console.error(`Coparticipação "${cliente.coparticipacao}" não encontrada para o plano "${cliente.tipoPlano}"`);
-                return this.getTabelaFallback();
-            }
-            
-            // Verifica se a segmentação existe para o plano e coparticipação
-            if (!tabelaPrecos[cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao]) {
-                console.error(`Segmentação "${cliente.segmentacao}" não encontrada para o plano "${cliente.tipoPlano}" e coparticipação "${cliente.coparticipacao}"`);
-                return this.getTabelaFallback();
-            }
-            
-            // Verifica se a acomodação existe para a combinação anterior
-            if (!tabelaPrecos[cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao]) {
-                console.error(`Acomodação "${cliente.acomodacao}" não encontrada para a combinação de plano, coparticipação e segmentação especificada`);
-                return this.getTabelaFallback();
-            }
-            
-            // Retorna a tabela correspondente
-            return tabelaPrecos[cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao];
+            return tabela;
         } catch (error) {
             console.error('Erro ao obter tabela de preços:', error);
             return this.getTabelaFallback();
