@@ -3,7 +3,7 @@ const premiacoes_Vcard = (
     + 'VERSION:3.0\n' 
     + 'FN:PlansCoop\n' // full name
     + 'ORG:PlansCoop\n' // the organization of the contact
-    + 'TEL;type=CELL;type=VOICE;waid=553139952020:+55 3139952020\n' // WhatsApp ID + phone number
+    + 'TEL;type=CELL;type=VOICE;waid=5531993661077:+55 31993661077\n' // WhatsApp ID + phone number
     + 'END:VCARD'
 );
 

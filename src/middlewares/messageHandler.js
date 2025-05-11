@@ -10,12 +10,9 @@ class MessageHandler {
         
         // Lista de números bloqueados
         this.blockedNumbers = new Set([
-            '558182687275@s.whatsapp.net',
-            '553186977393@s.whatsapp.net',
-            '553171632221@s.whatsapp.net',
-            '5531997428235@s.whatsapp.net',
-            '5531997087192@s.whatsapp.net',
-            '5537999712076@s.whatsapp.net',
+            //? DDI + DDD + NÚMERO + @s.whatsapp.net
+            //* Exemplo: 5501998765432@s.whatsapp.net
+            '553198478235@s.whatsapp.net',
         ]);
     }
 

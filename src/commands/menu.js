@@ -1,12 +1,11 @@
 // menu.js
 const MENU_MODULES = {
-    1: { path: './menuCalcularCotacao', name: 'cotacao' },
+    1: { path: './menuCotacao/menuCotacao', name: 'cotacao' },
     2: { path: './menuTabelas', name: 'tabelas' },
     3: { path: './menuSuporte', name: 'suporte' },
     4: { path: './menuTreinamento', name: 'treinamento' },
     5: { path: './menuCadastroParceiro', name: 'parceiro' },
     6: { path: './menuPremiacoes', name: 'premiacoes' },
-    
 };
 
 class Menu {
@@ -85,7 +84,7 @@ class Menu {
             try {
                 const module = require(menuModule.path);
                 state.currentMenu = menuModule.name;
-                return module.getMenu();
+                return module.getMenu(state);
             } catch (error) {
                 console.error('Erro ao carregar módulo:', error);
                 return "⚠️ Desculpe, esta opção está temporariamente indisponível.";
