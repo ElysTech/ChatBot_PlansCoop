@@ -3,12 +3,12 @@
     //- Qual a quantidade de beneficiários?
     //- Qual plano deseja contratar?
     //- Qual o tipo de coparticipação?
-    - Qual o tipo de acomodação?
-    - Informe as idades dos beneficiários.
+    //- Qual o tipo de acomodação?
+    //- Informe as idades dos beneficiários.
     - Deseja salvar a cotação?
 
     * Encerra o fluxo com a mensagem:
-        Atendimento Encerrado. Digite qualquer tecla para iniciar um novo atendimento.
+        Atendimento Encerrado. Digite qualquer tecla para iniciar um novo atendimento.
      
 */
 
@@ -53,11 +53,14 @@ class FlowUberlandiaPJ {
                 return this.processarSegmentacao(lowerCaseUserInput, state);
             case 'acomodacao':
                 return this.processarAcomodacao(lowerCaseUserInput, state);
+            case 'assistencia':
+                return this.processarAssistencia(lowerCaseUserInput, state);
             case 'idades':
                 return this.processarIdades(lowerCaseUserInput, state);
             case 'confirmar':
                 return this.processarConfirmacao(lowerCaseUserInput, state);
             default:
+                console.log('ERRO:\n    Pergunta não reconhecida:', cliente.lastQuestion, "\n   Resposta:", userInput);
                 return "⚠️ Ocorreu um erro. Por favor, digite 'Q' para reiniciar.";
         }
     }
@@ -273,6 +276,12 @@ class FlowUberlandiaPJ {
         try {
             // Calcula o valor da cotação
             const resultado = this.calcularCotacao(cliente);
+            
+            // Verifica se o resultado é válido
+            if (!resultado || !resultado.valorTotal) {
+                throw new Error("Resultado inválido ou falha no cálculo");
+            }
+            
             cliente.valorTotal = resultado.valorTotal;
             cliente.detalhamento = resultado.detalhamento;
             cliente.lastQuestion = 'confirmar';
@@ -280,7 +289,7 @@ class FlowUberlandiaPJ {
             // Formata o resultado para exibição
             let mensagem = "*📊 RESULTADO DA COTAÇÃO:*\n\n";
             mensagem += `*Tipo:* Pessoa Jurídica\n`;
-            mensagem += `*Cidade:* Belo Horizonte\n`;
+            mensagem += `*Cidade:* Uberlândia\n`;  // Corrigido para Uberlândia
             mensagem += `*Quantidade:* ${cliente.qtdBeneficiario} pessoas\n`;
             mensagem += `*Plano:* ${cliente.tipoPlano}\n`;
             mensagem += `*Coparticipação:* ${cliente.coparticipacao}\n`;
@@ -374,48 +383,64 @@ class FlowUberlandiaPJ {
             return { valorTotal, detalhamento };
         } catch (error) {
             console.error("Erro ao calcular cotação:", error);
-            return {
-                valorTotal: 0,
-                detalhamento: cliente.idades.map(idade => ({ idade, valor: 0 }))
-            };
+            throw new Error("Falha no cálculo da cotação");
         }
     }
 
     static obterTabelaPrecos(cliente) {
         try {
             let tabela;
-            let basePath;
             
-            // Navega pela estrutura da tabela
-            try {
-                basePath = tabelaHappyVidaPJ.Uberlandia[cliente.qtdBeneficiario][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao];
-            } catch (error) {
-                console.log("L393: Erro ao definir caminho base da tabela de preços:\n", error);
-                return "Tabela não encontrada";
-            }
-            
-            //* Para faixas com assistência médica (30-99)
-            try{
-                if (cliente.assistencia) {
-                    tabela = basePath[cliente.acomodacao][cliente.assistencia];
-                } else {
-                    //* Para 2-29 sem assistência médica
-                    tabela = basePath[cliente.acomodacao];
+            // Verifica a estrutura e corrige o caminho para evitar erro de propriedade indefinida
+            if (cliente.qtdBeneficiario === '30-99' && cliente.tipoPlano === 'Nosso Médico') {
+                // Verificamos se existe o estrutura específica para Nosso Médico em 30-99
+                if (!tabelaHappyVidaPJ.Uberlandia['30-99']['Nosso Médico']) {
+                    // Se não existir, procuramos na raiz
+                    if (tabelaHappyVidaPJ.Uberlandia['Nosso Médico']) {
+                        // Se achou na raiz, usa essa estrutura
+                        const baseNossoMedico = tabelaHappyVidaPJ.Uberlandia['Nosso Médico'][cliente.coparticipacao][cliente.segmentacao];
+                        
+                        if (cliente.acomodacao === 'ENFERM') {
+                            return baseNossoMedico['ENFERM'];
+                        } else if (cliente.acomodacao === 'APART' && cliente.assistencia) {
+                            return baseNossoMedico['APART'][cliente.assistencia];
+                        }
+                    }
+                    
+                    // Se não encontrou, usa os valores de 2-29 como fallback
+                    console.log("Usando tabela de 2-29 para Nosso Médico como fallback");
+                    return tabelaHappyVidaPJ.Uberlandia['2-29']['Nosso Médico'][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao];
                 }
-            } catch (error) {
-                console.log("L406: Erro ao acessar a tabela de preços:", error);
-                return "Tabela não encontrada";
             }
-           
+            
+            // Caminho normal para estruturas bem definidas
+            if (cliente.qtdBeneficiario === '2-29') {
+                // Estrutura para 2-29 vidas
+                tabela = tabelaHappyVidaPJ.Uberlandia['2-29'][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao];
+            } else if (cliente.qtdBeneficiario === '30-99') {
+                // Estrutura para 30-99 vidas (com verificação de presença de assistência médica)
+                if (cliente.assistencia) {
+                    if (cliente.segmentacao === 'AMB+HOSP+OBST' && cliente.acomodacao === 'APART' && 
+                        cliente.tipoPlano === 'Nosso Plano' && cliente.coparticipacao === 'Parcial') {
+                        // Caso específico onde não há subdivisão por assistência médica
+                        tabela = tabelaHappyVidaPJ.Uberlandia['30-99'][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao];
+                    } else {
+                        // Caso normal com subdivisão por assistência médica
+                        tabela = tabelaHappyVidaPJ.Uberlandia['30-99'][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao][cliente.acomodacao][cliente.assistencia];
+                    }
+                } else {
+                    throw new Error("Assistência médica não definida para 30-99 vidas");
+                }
+            }
             
             if (!tabela) {
                 console.error('Tabela não encontrada para:\n\n', {
-                    qtdBeneficiario: cliente.qtdBeneficiario + '\n',
-                    tipoPlano: cliente.tipoPlano + '\n',
-                    coparticipacao: cliente.coparticipacao + '\n',
-                    segmentacao: cliente.segmentacao + '\n',
-                    acomodacao: cliente.acomodacao + '\n',
-                    assistencia: cliente.assistencia + '\n'
+                    qtdBeneficiario: cliente.qtdBeneficiario,
+                    tipoPlano: cliente.tipoPlano,
+                    coparticipacao: cliente.coparticipacao,
+                    segmentacao: cliente.segmentacao,
+                    acomodacao: cliente.acomodacao,
+                    assistencia: cliente.assistencia
                 });
                 throw new Error("Tabela de preços não encontrada");
             }
@@ -423,7 +448,7 @@ class FlowUberlandiaPJ {
             return tabela;
         } catch (error) {
             console.error('Erro ao obter tabela de preços:', error);
-            return null;
+            throw error;
         }
     }
 
