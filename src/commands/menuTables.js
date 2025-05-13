@@ -24,10 +24,10 @@ class MenuTabelas {
                 state.hasShownWelcome = false;
                 // Retorna um array de objetos de documento
                 return [
-                    this.getPdfDocument("PME/PME BELO HORIZONTE 30 A 99 VIDAS.pdf", "Tabela: *_PME Belo Horizonte - 30 a 99 pessoas._*"),
-                    this.getPdfDocument("PME/SUPER SIMPLES BH 2 A 29 VIDAS.pdf", "Tabela: *_SUPER SIMPLES Belo Horizonte - 2 a 29 pessoas._*"),
-                    this.getPdfDocument("PF/AMBULATORIAL BELO HORIZONTE.pdf", "Tabela: *_AMBULATORIAL Belo Horizonte_*"),
-                    this.getPdfDocument("PF/INDIVIDUAL COMPLETO BELO HORIZONTE.pdf", "Tabela: *_INDIVIDUAL COMPLETO Belo Horizonte_*"),
+                    this.getPdfDocument("PME/PME BELO HORIZONTE 30 A 99 VIDAS.pdf", "Tabela:\n *_PME Belo Horizonte - 30 a 99 pessoas._*"),
+                    this.getPdfDocument("PME/SUPER SIMPLES BH 2 A 29 VIDAS.pdf", "Tabela:\n *_SUPER SIMPLES Belo Horizonte - 2 a 29 pessoas._*"),
+                    this.getPdfDocument("PF/AMBULATORIAL BELO HORIZONTE.pdf", "Tabela:\n *_AMBULATORIAL Belo Horizonte_*"),
+                    this.getPdfDocument("PF/INDIVIDUAL COMPLETO BELO HORIZONTE.pdf", "Tabela:\n *_INDIVIDUAL COMPLETO Belo Horizonte_*"),
                     {text: '_Atendimento Encerrado_ \n👋 Obrigado por usar nossos serviços. Até logo!'}
                 ];
                 
@@ -36,10 +36,10 @@ class MenuTabelas {
                 state.hasShownWelcome = false;
                 // Retorna um array de objetos de documento
                 return [
-                    this.getPdfDocument("PME/PME TRIANGULO MINEIRO 30 A 99 VIDAS.pdf", "Tabela: *_PME Triângulo Mineiro - 30 a 99 pessoas._*"),
-                    this.getPdfDocument("PME/SUPER SIMPLES TRIANGULO MINEIRO 2 A 29 VIDAS.pdf", "Tabela: *_SUPER SIMPLES Triângulo Mineiro- 2 a 29 pessoas._*"),
-                    this.getPdfDocument("PF/AMBULATORIAL UBERABA E UBERLANDIA.pdf", "Tabela: *_AMBULATORIAL Uberaba e Uberlandia_*"),
-                    this.getPdfDocument("PF/INDIVIDUAL COMPLETO UBERABA E UBERLANDIA.pdf", "Tabela: *_INDIVIDUAL COMPLETO Uberaba e Uberlandia_*"),
+                    this.getPdfDocument("PME/PME TRIANGULO MINEIRO 30 A 99 VIDAS.pdf", "Tabela:\n *_PME Triângulo Mineiro - 30 a 99 pessoas._*"),
+                    this.getPdfDocument("PME/SUPER SIMPLES TRIANGULO MINEIRO 2 A 29 VIDAS.pdf", "Tabela:\n *_SUPER SIMPLES Triângulo Mineiro- 2 a 29 pessoas._*"),
+                    this.getPdfDocument("PF/AMBULATORIAL UBERABA E UBERLANDIA.pdf", "Tabela:\n *_AMBULATORIAL Uberaba e Uberlandia_*"),
+                    this.getPdfDocument("PF/INDIVIDUAL COMPLETO UBERABA E UBERLANDIA.pdf", "Tabela:\n *_INDIVIDUAL COMPLETO Uberaba e Uberlandia_*"),
                     {text: '_Atendimento Encerrado_ \n👋 Obrigado por usar nossos serviços. Até logo!'}
                 ];
                 
@@ -51,10 +51,10 @@ class MenuTabelas {
     static getPdfDocument(filename, title) {
         // Retorna um objeto de documento no formato que o Baileys espera
         return {
-            document: { url: `./assets/pdfs/${filename}` }, // Caminho para o PDF
+            document: { url: `./DOCS/pdfs/${filename}` }, // Caminho para o PDF
             mimetype: 'application/pdf',
             fileName: filename,
-            caption: `📄 ${title}\n\nDigite "Q" para voltar ao menu principal.`
+            caption: `📄 ${title}`
         };
     }
 

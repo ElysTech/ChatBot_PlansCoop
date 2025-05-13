@@ -6,7 +6,7 @@ class MessageHandler {
         this.userStates = new Map();
         this.userTimers = new Map();
         this.messageHistory = new Map();
-        this.TIMEOUT_DURATION = 4 * 60 * 1000;
+        this.TIMEOUT_DURATION = 1 * 60 * 1000; // Timeout de 1 minuto (em milissegundos)
         
         // Lista de números bloqueados
         this.blockedNumbers = new Set([
@@ -53,8 +53,6 @@ class MessageHandler {
                 const oldestKey = this.messageHistory.keys().next().value;
                 this.messageHistory.delete(oldestKey);
             }
-    
-            this.resetUserTimer(from);
     
             if (!this.userStates.has(from)) {
                 this.initializeUserState(from);
@@ -121,27 +119,6 @@ class MessageHandler {
             selectedCity: null,
             hasSeenTable: false
         });
-    }
-
-    resetUserTimer(userId) {
-        if (this.userTimers.has(userId)) {
-            clearTimeout(this.userTimers.get(userId));
-        }
-
-        const timer = setTimeout(async () => {
-            try {
-                await this.sock.sendMessage(userId, { 
-                    text: '⚠️ Tempo de atividade esgotado, encerrando sessão... ⚠️' 
-                });
-
-                this.userStates.delete(userId);
-                this.userTimers.delete(userId);
-            } catch (error) {
-                console.error('Erro ao encerrar sessão:', error);
-            }
-        }, this.TIMEOUT_DURATION);
-
-        this.userTimers.set(userId, timer);
     }
 }
 
