@@ -25,7 +25,7 @@ class MenuSuporte {
                             }
                         },
                         {
-                            text: `💼 Aqui está o contato para suporte comercial.\nLigue para nós ou envie uma mensagem! \n\n _Digite "*Q*" para voltar ao menu principal_`
+                            text: `💼 Aqui está o contato para suporte comercial.\nLigue para nós ou envie uma mensagem!`
                         },
                         {text: '_Atendimento Encerrado_ \n👋 Obrigado por usar nossos serviços. Até logo!'}
                     ];
@@ -40,7 +40,7 @@ class MenuSuporte {
                             }
                         },
                         {
-                            text: '💼 Aqui está o contato para suporte financeiro.\nLigue para nós ou envie uma mensagem! \n\n _Digite "*Q*" para voltar ao menu principal_'
+                            text: '💼 Aqui está o contato para suporte financeiro.\nLigue para nós ou envie uma mensagem! \n\n'
                         },
                         {text: '_Atendimento Encerrado_ \n👋 Obrigado por usar nossos serviços. Até logo!'}
 
@@ -57,7 +57,7 @@ class MenuSuporte {
                             }
                         },
                         {
-                            text: `💼 Aqui está o contato para suporte de cadastro.\nLigue para nós ou envie uma mensagem! \n\n _Digite "*Q*" para voltar ao menu principal_`
+                            text: `💼 Aqui está o contato para suporte de cadastro.\nLigue para nós ou envie uma mensagem! \n\n`
                         },
                         {text: '_Atendimento Encerrado_ \n👋 Obrigado por usar nossos serviços. Até logo!'}
 
@@ -81,7 +81,7 @@ class MenuSuporte {
     static resetState(state) {
         Object.assign(state, {
             currentMenu: 'main',
-            hasShownWelcome: true,
+            hasShownWelcome: false,
             selectedCity: null,
             previousInput: null
         });

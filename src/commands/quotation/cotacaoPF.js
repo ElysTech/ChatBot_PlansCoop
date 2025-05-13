@@ -30,7 +30,7 @@ class CotacaoPF {
             //? 4 - Plano
             //? 5 - Coparticipação
             //? 6 - Acomodação (apenas para cobertura Completa)
-            //? 7 - [Assistência] (apenas para BH com cobertura Ambulatorial)
+            //? 7 - [Assistência] (apenas para BH com cobertura Ambulatorial ou Completa)
             //? 8 - Idades
             //? 9 - Cálculo
 
@@ -183,12 +183,12 @@ class CotacaoPF {
         }
 
         // LÓGICA DE FLUXO: ASSISTÊNCIA OU ACOMODAÇÃO OU DIRETO PARA IDADES
-        if (cliente.cidade === 'Belo Horizonte' && cliente.cobertura === 'Ambulatorial') {
-            // Para BH com plano ambulatorial, pergunta sobre assistência
+        if (cliente.cidade === 'Belo Horizonte' && (cliente.cobertura === 'Ambulatorial' || cliente.cobertura === 'Completo')) {
+            // Para BH com plano ambulatorial OU completo, pergunta sobre assistência
             cliente.lastQuestion = 'assistencia';
             return "Qual a assistência desejada?\n\n 1 - Médico 1\n 2 - Médico 2";
         } else if (cliente.cobertura === 'Completo') {
-            // Para cobertura completa, pergunta sobre acomodação
+            // Para cobertura completa em outras cidades, pergunta sobre acomodação
             cliente.lastQuestion = 'acomodacao';
             return "Qual a acomodação?\n\n 1 - Enfermaria\n 2 - Apartamento";
         } else {
@@ -198,7 +198,7 @@ class CotacaoPF {
         }
     }
     
-    // Processa a assistência e pergunta as idades
+    // Processa a assistência e pergunta as idades ou acomodação
     static processarAssistencia(userInput, state) {
         const cliente = state.cliente;
         
@@ -210,9 +210,16 @@ class CotacaoPF {
             return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1 ou 2 para Médico 2.";
         }
         
-        // Próxima pergunta: idades
-        cliente.lastQuestion = 'idades';
-        return "Digite as idades dos beneficiários separadas por vírgula (exemplo: 30,45,12):";
+        // Após processar assistência, se for Completo em BH, perguntar acomodação
+        // Se for Ambulatorial, ir direto para idades
+        if (cliente.cobertura === 'Completo') {
+            cliente.lastQuestion = 'acomodacao';
+            return "Qual a acomodação?\n\n 1 - Enfermaria\n 2 - Apartamento";
+        } else {
+            // Para ambulatorial, ir direto para idades
+            cliente.lastQuestion = 'idades';
+            return "Digite as idades dos beneficiários separadas por vírgula (exemplo: 30,45,12):";
+        }
     }
     
     // Processa a acomodação e pergunta as idades
@@ -270,7 +277,8 @@ class CotacaoPF {
                 mensagem += `*Acomodação:* ${cliente.acomodacao === 'ENFERM' ? 'Enfermaria' : 'Apartamento'}\n`;
             }
             
-            if (cliente.cidade === 'Belo Horizonte' && cliente.cobertura === 'Ambulatorial') {
+            // Mostra assistência para BH (ambulatorial ou completo)
+            if (cliente.cidade === 'Belo Horizonte' && (cliente.cobertura === 'Ambulatorial' || cliente.cobertura === 'Completo')) {
                 mensagem += `*Assistência:* ${cliente.assistencia}\n`;
             }
             
@@ -405,13 +413,11 @@ class CotacaoPF {
                 return { valor: valorOdonto };
             }
             
-            // Determinar qual médico usar (para BH Ambulatorial)
+            // Determinar qual médico usar
             let medico = '';
-            if (cliente.cidade === 'Belo Horizonte' && cliente.cobertura === 'Ambulatorial') {
+            if (cliente.cidade === 'Belo Horizonte' && (cliente.cobertura === 'Ambulatorial' || cliente.cobertura === 'Completo')) {
+                // Para BH (ambulatorial ou completo), usar a assistência escolhida
                 medico = cliente.assistencia === 'Médico 1' ? 'medico 1' : 'medico 2';
-            } else if (cliente.cobertura === 'Completo') {
-                // Para Completo também tem médico 1 e 2
-                medico = 'medico 1'; // Padrão se não houver assistência definida
             }
             
             // Construir o caminho para a tabela

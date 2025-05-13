@@ -1,11 +1,11 @@
 // menu.js
 const MENU_MODULES = {
-    1: { path: './menuCotacao/menuCotacao', name: 'cotacao' },
-    2: { path: './menuTabelas', name: 'tabelas' },
-    3: { path: './menuSuporte', name: 'suporte' },
-    4: { path: './menuTreinamento', name: 'treinamento' },
-    5: { path: './menuCadastroParceiro', name: 'parceiro' },
-    6: { path: './menuPremiacoes', name: 'premiacoes' },
+    1: { path: './quotation/menuCotacao', name: 'cotacao' },
+    2: { path: './menuTables', name: 'tabelas' },
+    3: { path: './menuSupport', name: 'suporte' },
+    4: { path: './menuTraining', name: 'treinamento' },
+    5: { path: './menuPartnerRegistration', name: 'parceiro' },
+    6: { path: './menuAwards', name: 'premiacoes' },
 };
 
 class Menu {
