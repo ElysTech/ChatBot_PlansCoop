@@ -1,5 +1,5 @@
 const tabelaHappyVidaPJ = {
-"Uberlândia": {
+"Uberlandia": {
       "2-29": {
         "Nosso Plano": {
           "Parcial": {
@@ -364,4 +364,4 @@ const tabelaHappyVidaPJ = {
         }
       }
     }
- 
+module.exports = tabelaHappyVidaPJ;

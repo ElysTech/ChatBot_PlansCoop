@@ -145,3 +145,4 @@ const tabelaHappyVidaPF = {
     }
   }
 }
+module.exports = tabelaHappyVidaPF;

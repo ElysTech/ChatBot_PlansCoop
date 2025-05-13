@@ -1,21 +1,36 @@
 class MenuCotacao {
     static async execute(userInput, state) {
-        // Se já temos um fluxo específico em andamento, redireciona para ele
-        if (state.currentMenu === 'cotacao_pf') {
-            const FlowBeloHorizontePF = require('./questions/beloHorizonte/flowBeloHorizontePF');
-            return FlowBeloHorizontePF.execute(userInput, state);
-        } else if (state.currentMenu === 'cotacao_pj') {
-            const FlowBeloHorizontePJ = require('./questions/beloHorizonte/flowBeloHorizontePJ');
-            return FlowBeloHorizontePJ.execute(userInput, state);
-        }
-
         // Inicializa o objeto de cliente no estado se não existir
         if (!state.cliente) {
             state.cliente = {};
         }
-
         let cliente = state.cliente;
         const lowerCaseUserInput = userInput.toLowerCase();
+
+        //* Se já temos um fluxo específico em andamento, redireciona para ele
+        switch (cliente.cidade) {
+            case 'Belo Horizonte':
+                if (state.currentMenu === 'cotacao_pf') {
+                    const FlowBeloHorizontePF = require('./questions/beloHorizonte/flowBeloHorizontePF');
+                    return FlowBeloHorizontePF.execute(userInput, state);
+                } else if (state.currentMenu === 'cotacao_pj') {
+                    const FlowBeloHorizontePJ = require('./questions/beloHorizonte/flowBeloHorizontePJ');
+                    return FlowBeloHorizontePJ.execute(userInput, state);
+                }
+
+            case 'Uberlandia':
+                if (state.currentMenu === 'cotacao_pf') {
+                    const FlowUberlandiaPF = require('./questions/uberlandia/flowUberlandiaPF');
+                    return FlowUberlandiaPF.execute(userInput, state);
+                } else if (state.currentMenu === 'cotacao_pj') {
+                    const FlowUberlandiaPJ = require('./questions/uberlandia/flowUberlandiaPJ');
+                    return FlowUberlandiaPJ.execute(userInput, state);
+                }
+
+            default:
+                //* Caso contrário, continua com o fluxo padrão
+                break;
+        }
 
         // Voltar ao menu principal se digitar 'q'
         if (lowerCaseUserInput === 'q') {
@@ -62,7 +77,7 @@ class MenuCotacao {
     static perguntarCidade() {
         return "🏙️ Para qual cidade deseja a cotação?\n\n" +
                " 1 - Belo Horizonte (Disponível) ✅\n" +
-               " 2 - Uberlândia (Em breve) 🚧\n" +
+               " 2 - Uberlândia (Disponível) ✅\n" +
                " 3 - Uberaba (Em breve) 🚧\n\n" +
                "Digite o número da sua escolha:";
     }
@@ -91,10 +106,22 @@ class MenuCotacao {
                 break;
                 
             case '2':
-                return "🚧 *Uberlândia*\n\nEsta cidade estará disponível em breve!\n" +
-                       "Por enquanto, temos cobertura apenas em Belo Horizonte.\n\n" +
-                       "Digite 1 para selecionar Belo Horizonte ou Q para voltar ao menu principal.";
-                       
+                cliente.cidade = 'Uberlandia';
+                // Redireciona para o fluxo apropriado
+                if (cliente.peopleType === 'PF') {
+                    // Altera o menu atual para cotacao_pf para manter o fluxo
+                    state.currentMenu = 'cotacao_pf';
+                    // Importa e executa o fluxo de Belo Horizonte PF
+                    const FlowBeloHorizontePF = require('./questions/beloHorizonte/flowBeloHorizontePF');
+                    return FlowBeloHorizontePF.iniciar(state);
+                } else if (cliente.peopleType === 'PJ') {
+                    // Altera o menu atual para cotacao_pj para manter o fluxo
+                    state.currentMenu = 'cotacao_pj';
+                    // Importa e executa o fluxo de Belo Horizonte PJ
+                    const FlowBeloHorizontePJ = require('./questions/beloHorizonte/flowBeloHorizontePJ');
+                    return FlowBeloHorizontePJ.iniciar(state);
+                }
+                break;
             case '3':
                 return "🚧 *Uberaba*\n\nEsta cidade estará disponível em breve!\n" +
                        "Por enquanto, temos cobertura apenas em Belo Horizonte.\n\n" +
