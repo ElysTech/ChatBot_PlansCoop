@@ -112,14 +112,14 @@ class MenuCotacao {
                     // Altera o menu atual para cotacao_pf para manter o fluxo
                     state.currentMenu = 'cotacao_pf';
                     // Importa e executa o fluxo de Belo Horizonte PF
-                    const FlowBeloHorizontePF = require('./questions/beloHorizonte/flowBeloHorizontePF');
-                    return FlowBeloHorizontePF.iniciar(state);
+                    const FlowUberlandiaPF = require('./questions/uberlandia/flowUberlandiaPF');
+                    return FlowUberlandiaPF.iniciar(state);
                 } else if (cliente.peopleType === 'PJ') {
                     // Altera o menu atual para cotacao_pj para manter o fluxo
                     state.currentMenu = 'cotacao_pj';
                     // Importa e executa o fluxo de Belo Horizonte PJ
-                    const FlowBeloHorizontePJ = require('./questions/beloHorizonte/flowBeloHorizontePJ');
-                    return FlowBeloHorizontePJ.iniciar(state);
+                    const FlowUberlandiaPJ = require('./questions/uberlandia/flowUberlandiaPJ');
+                    return FlowUberlandiaPJ.iniciar(state);
                 }
                 break;
             case '3':

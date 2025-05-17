@@ -1,24 +1,9 @@
-/*  QUESTION FLOW:
-    ? A sequência de perguntas é:
-    //- Qual a quantidade de beneficiários?
-    //- Qual plano deseja contratar?
-    //- Qual o tipo de coparticipação?
-    //- Qual o tipo de acomodação?
-    //- Informe as idades dos beneficiários.
-    - Deseja salvar a cotação?
-
-    * Encerra o fluxo com a mensagem:
-        Atendimento Encerrado. Digite qualquer tecla para iniciar um novo atendimento.
-     
-*/
-
 //Importa a tabela de preços:
 const tabelaHappyVidaPJ = require('../../table/pessoajuridica/tableUberlandia');
 
 class FlowUberlandiaPJ {
     static async iniciar(state) {
         console.log("Cotação Uberlândia PJ, iniciada ......\n....\n..");
-        
         // Já sabemos que é PJ e Uberlândia
         state.cliente.lastQuestion = 'qtdBeneficiario';
         state.currentMenu = 'cotacao_pj'; // Garante que o menu está correto
@@ -320,6 +305,8 @@ class FlowUberlandiaPJ {
         const cliente = state.cliente;
 
         if (userInput.toLowerCase() === 's') {
+            console.log("Cotação concluída com sucesso!\nEncerrando cálculo de cotação para PJ em Uberlândia... \n\n");
+
             const mensagem = "*✅ COTAÇÃO FINALIZADA COM SUCESSO!*\n\n" +
                 `Cotação para Pessoa Jurídica\n` +
                 `Plano ${cliente.tipoPlano} - ${cliente.segmentacao}\n` +
@@ -329,6 +316,7 @@ class FlowUberlandiaPJ {
 
             return mensagem;
         } else if (userInput.toLowerCase() === 'n') {
+            console.log("Cotação encerrada (não confirmada pelo usuário).\nEncerrando cálculo de cotação para PJ em Uberlândia... \n\n");
             this.resetState(state); // Reseta o estado do cliente
             return "Cotação cancelada.\n\nAtendimento Encerrado. Digite qualquer tecla para iniciar um novo atendimento.";
         } else {

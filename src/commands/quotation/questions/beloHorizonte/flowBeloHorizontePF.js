@@ -1,9 +1,8 @@
 const tabelaHappyVidaPF = require('../../table/pessoafisica/tableBeloHorizonte');
-const msgHandler = require('../../../../middlewares/messageHandler');
-const { handleMessage } = require('../../../../middlewares/messageHandler');
 
 class FlowBeloHorizontePF {
     static async iniciar(state) {
+        console.log("Cotação Belo Horizonte PF, iniciada ......\n....\n..");
         // Já sabemos que é PF e Belo Horizonte
         state.cliente.lastQuestion = 'cobertura';
         state.currentMenu = 'cotacao_pf'; // Garante que o menu está correto

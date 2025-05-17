@@ -3,6 +3,7 @@ const tabelaHappyVidaPJ = require('../../table/pessoajuridica/tableBeloHorizonte
 
 class FlowBeloHorizontePJ {
     static async iniciar(state) {
+        console.log("Cotação Belo Horizonte PJ, iniciada ......\n....\n..");
         // Já sabemos que é PJ e Belo Horizonte
         state.cliente.lastQuestion = 'qtdBeneficiario';
         state.currentMenu = 'cotacao_pj'; // Garante que o menu está correto
