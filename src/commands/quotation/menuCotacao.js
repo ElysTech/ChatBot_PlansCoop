@@ -26,6 +26,14 @@ class MenuCotacao {
                     const FlowUberlandiaPJ = require('./questions/uberlandia/flowUberlandiaPJ');
                     return FlowUberlandiaPJ.execute(userInput, state);
                 }
+            case 'Uberaba':
+            if (state.currentMenu === 'cotacao_pf') {
+                const FlowUberabaPF = require('./questions/uberaba/flowUberabaPF');
+                return FlowUberabaPF.execute(userInput, state);
+            } else if (state.currentMenu === 'cotacao_pj') {
+                const FlowUberabaPJ = require('./questions/uberaba/flowUberabaPJ');
+                return FlowUberabaPJ.execute(userInput, state);
+            }
 
             default:
                 //* Caso contrário, continua com o fluxo padrão
@@ -78,7 +86,7 @@ class MenuCotacao {
         return "🏙️ Para qual cidade deseja a cotação?\n\n" +
                " 1 - Belo Horizonte (Disponível) ✅\n" +
                " 2 - Uberlândia (Disponível) ✅\n" +
-               " 3 - Uberaba (Em breve) 🚧\n\n" +
+               " 3 - Uberaba (PJ Disponível) ✅\n\n" +
                "Digite o número da sua escolha:";
     }
 
@@ -123,9 +131,22 @@ class MenuCotacao {
                 }
                 break;
             case '3':
-                return "🚧 *Uberaba*\n\nEsta cidade estará disponível em breve!\n" +
-                       "Por enquanto, temos cobertura apenas em Belo Horizonte.\n\n" +
-                       "Digite 1 para selecionar Belo Horizonte ou Q para voltar ao menu principal.";
+                cliente.cidade = 'Uberaba';
+                // Redireciona para o fluxo apropriado
+                if (cliente.peopleType === 'PF') {
+                    // Altera o menu atual para cotacao_pf para manter o fluxo
+                    state.currentMenu = 'cotacao_pf';
+                    // Importa e executa o fluxo de Belo Horizonte PF
+                    const FlowUberabaPF = require('./questions/uberaba/flowUberabaPF');
+                    return FlowUberabaPF.iniciar(state);
+                } else if (cliente.peopleType === 'PJ') {
+                    // Altera o menu atual para cotacao_pj para manter o fluxo
+                    state.currentMenu = 'cotacao_pj';
+                    // Importa e executa o fluxo de Belo Horizonte PJ
+                    const FlowUberabaPJ = require('./questions/uberaba/flowUberabaPJ');
+                    return FlowUberabaPJ.iniciar(state);
+                }
+                break;
                        
             default:
                 return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" + this.perguntarCidade();
