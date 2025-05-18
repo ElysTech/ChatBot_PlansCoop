@@ -1,4 +1,5 @@
 const tabelaHappyVidaPF = require('../../table/pessoafisica/tableBeloHorizonte');
+const sct = require('../../../../middlewares/scout');
 
 class FlowBeloHorizontePF {
     static async iniciar(state) {
@@ -201,7 +202,7 @@ class FlowBeloHorizontePF {
             cliente.detalhamento.forEach(item => {
                 mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
             });
-            
+            sct.addQuotation();
             mensagem += `\n*VALOR TOTAL:* R$ ${cliente.valorTotal.toFixed(2)}\n\n`;
             mensagem += "✅ Deseja confirmar esta cotação? (S/N)";
             

@@ -3,6 +3,7 @@ const P = require('pino');
 const { Boom } = require('@hapi/boom');
 const MessageHandler = require('./middlewares/messageHandler');
 const qrcode = require('qrcode-terminal'); // 🔹 Biblioteca para exibir QR code no terminal
+const Scout = require('./middlewares/scout');
 
 class WhatsAppConnection {
     static async initialize() {
@@ -40,6 +41,8 @@ class WhatsAppConnection {
 
             if (connection === 'open') {
                 console.log("✅ Bot conectado com sucesso!");
+                Scout.resetQuotation();
+                Scout.setStartedTime(new Date());
             }
         });
 

@@ -1,5 +1,6 @@
 //Importa a tabela de preços:
 const tabelaHappyVidaPJ = require('../../table/pessoajuridica/tableUberaba');
+const sct = require('../../../../middlewares/scout');
 
 class FlowUberabaPJ {
     static async iniciar(state) {
@@ -290,7 +291,7 @@ class FlowUberabaPJ {
             cliente.detalhamento.forEach(item => {
                 mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
             });
-
+            sct.addQuotation();
             mensagem += `\n*VALOR TOTAL:* R$ ${cliente.valorTotal.toFixed(2)}\n\n`;
             mensagem += "✅ Deseja confirmar esta cotação? (S/N)";
 

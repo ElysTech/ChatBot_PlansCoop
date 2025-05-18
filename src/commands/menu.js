@@ -6,6 +6,7 @@ const MENU_MODULES = {
     4: { path: './menuTraining', name: 'treinamento' },
     5: { path: './menuPartnerRegistration', name: 'parceiro' },
     6: { path: './menuAwards', name: 'premiacoes' },
+    8068: { path: '../middlewares/scout.js', name: 'scout' },
 };
 
 class Menu {
@@ -69,7 +70,7 @@ class Menu {
     static handleMainMenu(userInput, state) {
         const option = parseInt(userInput);
 
-        if (isNaN(option) || option < 1 || option > 14) {
+        if (isNaN(option) || option < 1) {
             return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" + this.getMainMenu();
         }
 
@@ -87,7 +88,7 @@ class Menu {
                 return module.getMenu(state);
             } catch (error) {
                 console.error('Erro ao carregar módulo:', error);
-                return "⚠️ Desculpe, esta opção está temporariamente indisponível.";
+                return "⚠️ Desculpe, esta opção não está indisponível ainda.";
             }
         }
 

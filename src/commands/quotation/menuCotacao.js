@@ -84,9 +84,9 @@ class MenuCotacao {
     // Pergunta a cidade
     static perguntarCidade() {
         return "🏙️ Para qual cidade deseja a cotação?\n\n" +
-               " 1 - Belo Horizonte (Disponível) ✅\n" +
-               " 2 - Uberlândia (Disponível) ✅\n" +
-               " 3 - Uberaba (PJ Disponível) ✅\n\n" +
+               " 1 - Belo Horizonte\n" +
+               " 2 - Uberlândia\n" +
+               " 3 - Uberaba\n\n" +
                "Digite o número da sua escolha:";
     }
 

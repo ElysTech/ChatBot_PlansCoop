@@ -6,14 +6,13 @@ class MessageHandler {
         this.userStates = new Map();
         this.userTimers = new Map();
         this.messageHistory = new Map();
-        this.TIMEOUT_DURATION = 1 * 60 * 1000; // Timeout de 1 minuto (em milissegundos)
         
         // Lista de números bloqueados
         this.blockedNumbers = new Set([
             //? DDI + DDD + NÚMERO + @s.whatsapp.net
             //* Exemplo: 5501998765432@s.whatsapp.net
             '553198478235@s.whatsapp.net', //Lucelho Silva [n° profissional]
-            '553194195990@s.whatsapp.net', //Heliel
+            //'553194195990@s.whatsapp.net', //Heliel
         ]);
     }
 

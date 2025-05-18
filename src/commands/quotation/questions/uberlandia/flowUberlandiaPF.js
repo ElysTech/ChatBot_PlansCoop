@@ -1,4 +1,5 @@
 const tabelaHappyVidaPF = require('../../table/pessoafisica/tableUberlandia');
+const sct = require('../../../../middlewares/scout');
 
 class FlowUberlandiaPF {
     static async iniciar(state) {
@@ -197,7 +198,7 @@ class FlowUberlandiaPF {
             cliente.detalhamento.forEach(item => {
                 mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
             });
-            
+            sct.addQuotation();
             mensagem += `\n*VALOR TOTAL:* R$ ${cliente.valorTotal.toFixed(2)}\n\n`;
             mensagem += "✅ Deseja confirmar esta cotação? (S/N)";
             
