@@ -22,13 +22,19 @@ class Menu {
         // Se for a primeira interação ou estado resetado, mostra mensagem de boas-vindas
         if (!state.hasShownWelcome) {
             state.hasShownWelcome = true;
-            return "Oi, sou a Íris, assistente virtual da Corretora PlansCoop 🤖💜\n\n" + this.getMainMenu();
+            return {
+                image: {url: `./docs/images/Hapminas.jpeg`},
+                caption: "Oi, sou a Íris, assistente virtual Hapminas 🤖💜\n\n" + this.getMainMenu()
+            };
         }
 
         // Se estiver em algum submenu e digitar Q
         if (state.currentMenu !== 'main' && userInput.toLowerCase() === 'q') {
             this.resetState(state);
-            return "Oi, sou a Íris, assistente virtual da Corretora PlansCoop 🤖💜\n\n" + this.getMainMenu();
+            return {
+                image: {url: `./docs/images/Hapminas.jpeg`},
+                caption: "Oi, sou a Íris, assistente virtual Hapminas 🤖💜\n\n" + this.getMainMenu()
+            };
         }
 
         // Se estiver em algum submenu
@@ -45,7 +51,11 @@ class Menu {
                     // Se o módulo retornar null, significa que devemos mostrar a mensagem de boas-vindas
                     if (response === null) {
                         this.resetState(state);
-                        return "Oi, sou a Íris, assistente virtual da Corretora PlansCoop 🤖💜\n\n" + this.getMainMenu();
+                        
+                        return {
+                            image: {url: `./docs/images/Hapminas.jpeg`},
+                            caption: "Oi, sou a Íris, assistente virtual Hapminas 🤖💜\n\n" + this.getMainMenu()
+                        };
                     }
                     return response;
                 }
