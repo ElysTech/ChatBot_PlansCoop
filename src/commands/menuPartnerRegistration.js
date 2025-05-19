@@ -15,7 +15,7 @@ class MenuParceiro {
                 case 'cpf':
                     parceiro.cpf = userInput;
                     parceiro.etapaAnterior = 'telefone';
-                    return "💼 *_INFORME:_*\n\n * Telefone: ";
+                    return "💼 *_INFORME:_*\n\n Telefone: ";
 
                 case 'telefone':
                     if(userInput.replace(/[^0-9]/g, '').length != 11){

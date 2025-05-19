@@ -1,8 +1,8 @@
 const premiacoes_Vcard = (
     'BEGIN:VCARD\n' // metadata of the contact card
     + 'VERSION:3.0\n' 
-    + 'FN:Hapminas\n' // full name
-    + 'ORG:Hapminas\n' // the organization of the contact
+    + 'FN:Hapminas Comercial\n' // full name
+    + 'ORG:Hapminas Comercial\n' // the organization of the contact
     + 'TEL;type=CELL;type=VOICE;waid=5531993661077:+55 31993661077\n' // WhatsApp ID + phone number
     + 'END:VCARD'
 );
@@ -33,7 +33,7 @@ class MenuPremiações {
         return [
             {
                 contacts: { 
-                    displayName: 'Hapminas',
+                    displayName: 'Hapminas Comercial',
                     contacts: [{vcard: premiacoes_Vcard}]
                 }
             },
