@@ -18,7 +18,7 @@ class MenuTreinamento {
                 case 1:
                     console.log('menuTreinamento -> Treinamento selecionado: 1');
                     return {
-                        image: {url: `./docs/images/Logo.jpg`},
+                        image: {url: `./docs/images/Hapminas.jpeg`},
                         caption: (`💼 *_INFORMAÇÕES DO TREINAMENTO:_*\n\n  *Nome:* Treinamento 1\n  *Descrição:* Descrição do Treinamento 1\n  *Data:* 01/05/2025\n  *Horário:* 10:00\n  *Local:* Local do Treinamento 1\n  *Instrutores:* Instrutor 1, Instrutor 2\n  *Participantes:* Participante 1, Participante 2\n  *Valor:* R$ 100,00\n  *Increva-se:* www.example.com/treinamento1\n\n _Digite *Q* para voltar ao menu inicial._`)
                     }
                     
