@@ -224,7 +224,15 @@ class FlowBeloHorizontePF {
                             "📞 Um de nossos consultores entrará em contato em breve!\n\n" +
                             "Digite 'Q' para voltar ao menu principal.";
             
-            return mensagem;
+            return [
+                {text: mensagem},
+                {
+                    document: { url: `./docs/pdfs/REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG.pdf` }, // Caminho para o PDF
+                    mimetype: 'application/pdf',
+                    fileName: `REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG`,
+                    caption: `📄 *REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG*`
+                }
+            ];
         } else if (userInput.toLowerCase() === 'n') {
             this.resetState(state);
             return "Cotação cancelada.\n\nAtendimento Encerrado. Digite qualquer tecla para iniciar um novo atendimento.";

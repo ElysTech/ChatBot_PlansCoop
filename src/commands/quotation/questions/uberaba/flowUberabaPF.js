@@ -186,7 +186,15 @@ class FlowUberabaPF {
             mensagem += `\n*VALOR TOTAL:* R$ ${cliente.valorTotal.toFixed(2)}\n\n`;
             mensagem += "✅ Deseja confirmar esta cotação? (S/N)";
             
-            return mensagem;
+            return [
+                {text: mensagem},
+                {
+                    document: { url: `./docs/pdfs/REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG.pdf` }, // Caminho para o PDF
+                    mimetype: 'application/pdf',
+                    fileName: `REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG`,
+                    caption: `📄 *REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG*`
+                }
+            ];
         } catch (error) {
             console.error("L192: Erro ao processar idades\n", error);
             return "⚠️ Ocorreu um erro ao calcular a cotação. Por favor, tente novamente ou digite 'Q' para voltar ao menu principal.";

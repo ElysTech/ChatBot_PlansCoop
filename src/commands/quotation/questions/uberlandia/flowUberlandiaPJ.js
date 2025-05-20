@@ -315,7 +315,15 @@ class FlowUberlandiaPJ {
                 "📞 Um de nossos consultores entrará em contato em breve!\n\n" +
                 "Digite 'Q' para voltar ao menu principal.";
 
-            return mensagem;
+            return [
+                {text: mensagem},
+                {
+                    document: { url: `./docs/pdfs/REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG.pdf` }, // Caminho para o PDF
+                    mimetype: 'application/pdf',
+                    fileName: `REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG`,
+                    caption: `📄 *REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG*`
+                }
+            ];
         } else if (userInput.toLowerCase() === 'n') {
             console.log("Cotação encerrada (não confirmada pelo usuário).\nEncerrando cálculo de cotação para PJ em Uberlândia... \n\n");
             this.resetState(state); // Reseta o estado do cliente

@@ -5,7 +5,19 @@ const MessageHandler = require('./middlewares/messageHandler');
 const qrcode = require('qrcode-terminal'); // 🔹 Biblioteca para exibir QR code no terminal
 const Scout = require('./middlewares/scout');
 
+
+
+
 class WhatsAppConnection {
+    /**
+     * @returns {string} Retorna a data e hora atual no formato brasileiro
+     */
+    static RealTime() {
+        let RT = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        let RTstring = (`[` + RT +`] `);
+        return RTstring; //retorna a data e hora atual
+    }
+
     static async initialize() {
         const { state, saveCreds } = await useMultiFileAuthState('./assets/auth/baileys');
         
@@ -24,7 +36,7 @@ class WhatsAppConnection {
 
             // ✅ Exibir QR Code manualmente quando necessário
             if (qr) {
-                console.log("📌 Escaneie o QR Code abaixo para conectar:");
+                console.log(this.RealTime() + "📌 Escaneie o QR Code abaixo para conectar:");
                 qrcode.generate(qr, { small: true });
             }
 
@@ -32,15 +44,16 @@ class WhatsAppConnection {
                 const shouldReconnect = (lastDisconnect?.error instanceof Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
 
                 if (shouldReconnect) {
-                    console.log("🔄 Tentando reconectar...");
+                    console.log(this.RealTime() + "🔄 Tentando reconectar...");
                     this.initialize();
                 } else {
-                    console.log("🚫 Desconectado permanentemente. É necessário excluir a autenticação e conectar novamente.");
+                    console.log(this.RealTime() + "🚫 Desconectado permanentemente. É necessário excluir a autenticação e conectar novamente.");
                 }
             }
 
             if (connection === 'open') {
-                console.log("✅ Bot conectado com sucesso!");
+                
+                console.log(this.RealTime() + "✅ Bot conectado com sucesso!");
                 Scout.resetQuotation();
                 Scout.setStartedTime(new Date());
             }

@@ -11,6 +11,7 @@ class MessageHandler {
         this.blockedNumbers = new Set([
             //? DDI + DDD + NÚMERO + @s.whatsapp.net
             //* Exemplo: 5501998765432@s.whatsapp.net
+            '553183353438@s.whatsapp.net', //Número do bot (para evitar se auto-responder durante desenvolvimento de novas versões)
         ]);
     }
 
