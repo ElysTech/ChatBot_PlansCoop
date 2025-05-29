@@ -60,13 +60,13 @@ class FlowBeloHorizontePF {
                 cliente.segmentacao = 'AMB';
                 cliente.acomodacao = 'S/ACOM';
                 cliente.lastQuestion = 'plano';
-                return "Qual plano deseja?\n\n 1 - Nosso Plano\n 2 - Plano Odontológico 🦷";
+                return "Qual plano deseja?\n\n 1 - Plano Odontológico 🦷\n 2 - Nosso Plano";
                 
             case '2':
                 cliente.cobertura = 'Completo';
                 cliente.segmentacao = 'AMB+HOSP+OBST';
                 cliente.lastQuestion = 'plano';
-                return "Qual plano deseja?\n\n 1 - Nosso Plano & Nosso Médico\n 2 - Plano Odontológico 🦷";
+                return "Qual plano deseja?\n\n 1 - Plano Odontológico 🦷\n 2 - Nosso Plano\n 3- Nosso Médico";
                 
             default:
                 return "⚠️ Opção inválida. Por favor, escolha 1 para Ambulatorial ou 2 para Completo.";
@@ -77,7 +77,7 @@ class FlowBeloHorizontePF {
         const cliente = state.cliente;
     
         // Se for plano odontológico
-        if (userInput === '2') {
+        if (userInput === '1') {
             cliente.plano = 'Plano Odontológico';
             
             const valorPlano = tabelaHappyVidaPF.Belo_Horizonte[cliente.cobertura]['Planos_Odontológicos'];
@@ -90,20 +90,18 @@ class FlowBeloHorizontePF {
         }
     
         // Processa escolha de plano normal
-        if (userInput === '1') {
-            if (cliente.cobertura === 'Ambulatorial') {
-                cliente.plano = 'Nosso Plano';
-                cliente.tipoPlano = 'Nosso Plano';
-            } else if (cliente.cobertura === 'Completo') {
-                cliente.plano = 'Nosso Plano & Nosso Médico';
-                cliente.tipoPlano = 'Nosso Médico';
-            }
-            
-            cliente.lastQuestion = 'coparticipacao';
-            return "Qual tipo de coparticipação deseja?\n\n 1 - Com Coparticipação Total\n 2 - Com Coparticipação Parcial";
+        if (userInput === '2') {
+            cliente.plano = 'Nosso Plano';
+            cliente.tipoPlano = 'Nosso Plano';
+        } else if ( userInput === '3' && cliente.cobertura === 'Completo') {
+            cliente.plano = 'Nosso Médico';
+            cliente.tipoPlano = 'Nosso Médico';
         } else {
             return "⚠️ Opção inválida. Por favor, escolha uma opção válida.";
         }
+        
+        cliente.lastQuestion = 'coparticipacao';
+        return "Qual tipo de coparticipação deseja?\n\n 1 - Com Coparticipação Total\n 2 - Com Coparticipação Parcial";
     }
 
     static processarCoparticipacao(userInput, state) {
