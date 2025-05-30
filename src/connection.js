@@ -5,9 +5,6 @@ const MessageHandler = require('./middlewares/messageHandler');
 const qrcode = require('qrcode-terminal'); // 🔹 Biblioteca para exibir QR code no terminal
 const Scout = require('./middlewares/scout');
 
-
-
-
 class WhatsAppConnection {
     /**
      * @returns {string} Retorna a data e hora atual no formato brasileiro
@@ -24,6 +21,16 @@ class WhatsAppConnection {
         const sock = makeWASocket({
             auth: state,
             logger: P({ level: 'silent' }),
+            printQRInTerminal: false,
+            browser: ['Iris Bot', 'Chrome', '120.0.0'],
+            connectTimeoutMs: 60000,
+            defaultQueryTimeoutMs: 0,
+            keepAliveIntervalMs: 10000,
+            emitOwnEvents: true,
+            fireInitQueries: false,
+            generateHighQualityLinkPreview: false,
+            syncFullHistory: false,
+            markOnlineOnConnect: true
         });
 
         this.setupConnectionHandlers(sock, saveCreds);
@@ -41,21 +48,27 @@ class WhatsAppConnection {
             }
 
             if (connection === 'close') {
-                const shouldReconnect = (lastDisconnect?.error instanceof Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-
+                const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
+                const shouldReconnect = reason !== DisconnectReason.loggedOut && 
+                                    reason !== DisconnectReason.badSession;
+                
+                if (reason === DisconnectReason.badSession) {
+                    console.log('Sessão corrompida, limpando...');
+                    const fs = require('fs').promises;
+                    await fs.rm('./assets/auth/baileys', { recursive: true, force: true });
+                }
+                
                 if (shouldReconnect) {
-                    console.log(this.RealTime() + "🔄 Tentando reconectar...");
-                    this.initialize();
-                } else {
-                    console.log(this.RealTime() + "🚫 Desconectado permanentemente. É necessário excluir a autenticação e conectar novamente.");
+                    console.log(this.RealTime() + `🔄 Reconectando... (${reason})`);
+                    setTimeout(() => this.initialize(), 3000);
                 }
             }
 
             if (connection === 'open') {
-                
                 console.log(this.RealTime() + "✅ Bot conectado com sucesso!");
                 Scout.resetQuotation();
                 Scout.setStartedTime(new Date());
+                this.startHeartbeat(sock);
             }
         });
 
@@ -64,6 +77,16 @@ class WhatsAppConnection {
         // Inicializa o handler de mensagens
         const messageHandler = new MessageHandler(sock);
         messageHandler.initialize();
+    }
+
+    static startHeartbeat(sock) {
+    setInterval(async () => {
+        try {
+            await sock.sendPresenceUpdate('available');
+        } catch (error) {
+            console.log('Heartbeat falhou:', error.message);
+        }
+    }, 30000);
     }
 }
 
