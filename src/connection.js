@@ -12,7 +12,7 @@ class WhatsAppConnection {
     static reconnectAttempts = 0;
     static maxReconnectAttempts = 10;
     static isConnected = false;
-    static messageCache = new NodeCache({ stdTTL: 600 });
+    static messageCache = new NodeCache({ stdTTL: 300 });
     static reconnectTimeout = null;
     static pingInterval = null;
 
@@ -158,8 +158,8 @@ class WhatsAppConnection {
         // Limpa cache periodicamente
         setInterval(() => {
             const keys = this.messageCache.keys();
-            if (keys.length > 1000) {
-                keys.slice(0, 500).forEach(key => this.messageCache.del(key));
+            if (keys.length > 500) {
+                keys.slice(0, 250).forEach(key => this.messageCache.del(key));
             }
         }, 300000); // 5 minutos
 
@@ -251,7 +251,7 @@ class WhatsAppConnection {
                 const latency = Date.now() - start;
                 
                 // Reconecta se latência muito alta
-                if (latency > 10000) {
+                if (latency > 3500) {
                     console.log(this.RealTime() + `⚠️ Latência alta: ${latency}ms`);
                     this.scheduleReconnect(1000);
                 }
