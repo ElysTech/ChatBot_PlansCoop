@@ -1,4 +1,5 @@
 const commands = require('../commands');
+const Scout = require('./scout');
 
 class MessageHandler {
     constructor(sock) {
@@ -7,20 +8,22 @@ class MessageHandler {
         this.userTimers = new Map();
         this.messageHistory = new Map();
         
-        // Lista de números bloqueados
         this.blockedNumbers = new Set([
-            //? DDI + DDD + NÚMERO + @s.whatsapp.net
-            //* Exemplo: 5501998765432@s.whatsapp.net
-            '553183353438@s.whatsapp.net', //Número do bot (para evitar se auto-responder durante desenvolvimento de novas versões)
+            '553183353438@s.whatsapp.net',
         ]);
     }
 
     initialize() {
         this.sock.ev.on('messages.upsert', async (m) => {
+            const startTime = Date.now(); // Marca início para medir tempo de resposta
+            
             try {
                 await this.handleMessage(m);
+                const responseTime = Date.now() - startTime;
+                Scout.recordMessage(true, responseTime); // Registra sucesso
             } catch (error) {
                 console.error('Erro no handler de mensagens:', error);
+                Scout.recordMessage(false); // Registra falha
             }
         });
     }
@@ -36,7 +39,6 @@ class MessageHandler {
             const from = msg.key.remoteJid;
             const messageId = msg.key.id;
     
-            // Verifica se o número está bloqueado
             if (this.isNumberBlocked(from)) {
                 console.log(`Mensagem bloqueada do número: ${from}`);
                 return;
@@ -60,23 +62,18 @@ class MessageHandler {
             try {
                 const response = await commands.menu.execute(userMessage, this.userStates.get(from), from);
                 
-                // Verifica qual tipo de resposta recebemos
                 if (response === null) {
-                    // Se a resposta for null, reinicia o menu
                     const welcomeResponse = await commands.menu.execute('', this.userStates.get(from), from);
                     await this.sock.sendMessage(from, { text: welcomeResponse });
                 } 
-                // Se for um array, envia cada item sequencialmente
                 else if (Array.isArray(response)) {
                     for (const item of response) {
                         await this.sock.sendMessage(from, item);
                     }
                 }
-                // Se for um objeto, envia como o tipo apropriado
                 else if (typeof response === 'object' && response !== null) {
                     await this.sock.sendMessage(from, response);
                 }
-                // Caso contrário, envia como texto normal
                 else {
                     await this.sock.sendMessage(from, { text: response });
                 }
@@ -97,7 +94,6 @@ class MessageHandler {
     }
 
     blockNumber(number) {
-        // Garante que o número está no formato correto
         const formattedNumber = number.includes('@s.whatsapp.net') 
             ? number 
             : `${number}@s.whatsapp.net`;
