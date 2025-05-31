@@ -3,7 +3,7 @@ const suport_Vcard = (
     + 'VERSION:3.0\n' 
     + 'FN:Hapminas Comercial\n' // full name
     + 'ORG:Hapminas Comercial\n' // the organization of the contact
-    + 'TEL;type=CELL;type=VOICE;waid=5531993661077:+55 31993661077\n' // WhatsApp ID + phone number
+    + 'TEL;type=CELL;type=VOICE;waid=553193661077:+55 3193661077\n' // WhatsApp ID + phone number
     + 'END:VCARD'
 );
 

@@ -219,7 +219,6 @@ class FlowBeloHorizontePF {
                             `Cotação para Pessoa Física\n` +
                             `Plano ${cliente.plano} - ${cliente.cobertura}\n` +
                             `Valor Total: R$ ${cliente.valorTotal.toFixed(2)}\n\n` +
-                            "📞 Um de nossos consultores entrará em contato em breve!\n\n" +
                             "Digite 'Q' para voltar ao menu principal.";
             
             return [
