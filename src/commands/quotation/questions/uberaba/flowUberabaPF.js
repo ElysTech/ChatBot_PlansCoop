@@ -64,7 +64,8 @@ class FlowUberabaPF {
                 cliente.cobertura = 'Completo';
                 cliente.segmentacao = 'AMB+HOSP+OBST';
                 cliente.lastQuestion = 'plano';
-                return "Qual plano deseja?\n\n 1 - Nosso Plano\n 2 - Nosso Médico\n 3 - Plano Odontológico 🦷";
+                // return "Qual plano deseja?\n\n 1 - Nosso Plano\n 2 - Nosso Médico\n 3 - Plano Odontológico 🦷";
+                return "Qual plano deseja?\n\n 1 - Nosso Plano\n 2 - Nosso Médico";
                 
             default:
                 return "⚠️ Opção inválida. Por favor, escolha 1 para Ambulatorial ou 2 para Completo.";
@@ -82,9 +83,13 @@ class FlowUberabaPF {
             
             this.resetState(state);
             return [
-                {text: `💰 O valor do plano odontológico em Uberlândia, com cobertura ${cliente.cobertura.toLowerCase()}, é de R$ ${valorPlano.toFixed(2)} por pessoa/mês.`},
+                {text: `O plano odontológico está indisponível. Caso queira, pode estar entrando contato com nosso suporte para mais informações.`},
                 {text: "Seu atendimento está sendo encerrado. Você pode enviar uma mensagem para iniciar um novo atendimento.\n\n👋 Obrigado por utilizar nossos serviços!"},
             ];
+            // return [
+            //     {text: `💰 O valor do plano odontológico em Uberlândia, com cobertura ${cliente.cobertura.toLowerCase()}, é de R$ ${valorPlano.toFixed(2)} por pessoa/mês.`},
+            //     {text: "Seu atendimento está sendo encerrado. Você pode enviar uma mensagem para iniciar um novo atendimento.\n\n👋 Obrigado por utilizar nossos serviços!"},
+            // ];
         }
     
         // Processa escolha de plano normal

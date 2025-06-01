@@ -60,13 +60,15 @@ class FlowUberlandiaPF {
                 cliente.segmentacao = 'AMB';
                 cliente.acomodacao = 'S/ACOM';
                 cliente.lastQuestion = 'plano';
-                return "Qual plano deseja?\n\n 1 - Plano Odontológico 🦷 \n 2 - Nosso Plano";
+                // return "Qual plano deseja?\n\n 1 - Plano Odontológico 🦷 \n 2 - Nosso Plano";
+                return "Qual plano deseja?\n\n 2 - Nosso Plano";
                 
             case '2':
                 cliente.cobertura = 'Completo';
                 cliente.segmentacao = 'AMB+HOSP+OBST';
                 cliente.lastQuestion = 'plano';
-                return "Qual plano deseja?\n\n 1 - Plano Odontológico 🦷\n 2 - Nosso Plano\n 3 - Nosso Médico";
+                // return "Qual plano deseja?\n\n 1 - Plano Odontológico 🦷\n 2 - Nosso Plano\n 3 - Nosso Médico";
+                return "Qual plano deseja?\n\n 2 - Nosso Plano\n 3 - Nosso Médico";
                 
             default:
                 return "⚠️ Opção inválida. Por favor, escolha 1 para Ambulatorial ou 2 para Completo.";
@@ -84,9 +86,13 @@ class FlowUberlandiaPF {
             
             this.resetState(state);
             return [
-                {text: `💰 O valor do plano odontológico em Uberlândia, com cobertura ${cliente.cobertura.toLowerCase()}, é de R$ ${valorPlano.toFixed(2)} por pessoa/mês.`},
+                {text: `O plano odontológico está indisponível. Caso queira, pode estar entrando contato com nosso suporte para mais informações.`},
                 {text: "Seu atendimento está sendo encerrado. Você pode enviar uma mensagem para iniciar um novo atendimento.\n\n👋 Obrigado por utilizar nossos serviços!"},
             ];
+            // return [
+            //     {text: `💰 O valor do plano odontológico em Uberlândia, com cobertura ${cliente.cobertura.toLowerCase()}, é de R$ ${valorPlano.toFixed(2)} por pessoa/mês.`},
+            //     {text: "Seu atendimento está sendo encerrado. Você pode enviar uma mensagem para iniciar um novo atendimento.\n\n👋 Obrigado por utilizar nossos serviços!"},
+            // ];
         }
     
         // Processa escolha de plano normal
@@ -117,7 +123,8 @@ class FlowUberlandiaPF {
         }
         // Para ambos os planos em BH, pergunta sobre assistência
         cliente.lastQuestion = 'assistencia';
-        return "Qual assistência médica deseja?\n\n 1 - Médico 1\n 2 - Médico 2";
+        // return "Qual assistência médica deseja?\n\n 1 - Médico 1\n 2 - Médico 2";
+        return "Qual assistência médica deseja?\n\n 1 - Médico 1";
     }
     
     static processarAssistencia(userInput, state) {
@@ -127,10 +134,12 @@ class FlowUberlandiaPF {
             cliente.assistencia = 'Médico 1';
             cliente.assistenciaTabela = 'medico 1';
         } else if (userInput === '2') {
+            return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1.";
             cliente.assistencia = 'Médico 2';
             cliente.assistenciaTabela = 'medico 2';
         } else {
-            return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1 ou 2 para Médico 2.";
+            // return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1 ou 2 para Médico 2.";
+            return "⚠️ Opção inválida. Por favor, escolha 1 para Médico.";
         }
         
         // Se for Completo, pergunta acomodação
