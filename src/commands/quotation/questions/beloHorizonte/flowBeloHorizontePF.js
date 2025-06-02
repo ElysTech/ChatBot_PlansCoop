@@ -136,8 +136,6 @@ class FlowBeloHorizontePF {
             cliente.assistenciaTabela = 'medico 1';
         } else if (userInput === '2') {
             return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1.";
-            cliente.assistencia = 'Médico 2';
-            cliente.assistenciaTabela = 'medico 2';
         } else {
             // return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1 ou 2 para Médico 2.";
             return "⚠️ Opção inválida. Por favor, escolha 1 para Médico 1.";
@@ -232,7 +230,7 @@ class FlowBeloHorizontePF {
             return [
                 {text: mensagem},
                 {
-                    document: { url: `./docs/pdfs/REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG.pdf` }, // Caminho para o PDF
+                    document: { url: path.resolve('./docs/pdfs/REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG.pdf') }, // Caminho para o PDF
                     mimetype: 'application/pdf',
                     fileName: `REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG`,
                     caption: `📄 *REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG*`

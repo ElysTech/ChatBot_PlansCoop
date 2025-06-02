@@ -1,5 +1,7 @@
 const commands = require('../commands');
 const Scout = require('./scout');
+const fs = require('fs');
+const path = require('path');
 
 class MessageHandler {
     constructor(sock) {
@@ -15,15 +17,15 @@ class MessageHandler {
 
     initialize() {
         this.sock.ev.on('messages.upsert', async (m) => {
-            const startTime = Date.now(); // Marca início para medir tempo de resposta
+            const startTime = Date.now();
             
             try {
                 await this.handleMessage(m);
                 const responseTime = Date.now() - startTime;
-                Scout.recordMessage(true, responseTime); // Registra sucesso
+                Scout.recordMessage(true, responseTime);
             } catch (error) {
                 console.error('Erro no handler de mensagens:', error);
-                Scout.recordMessage(false); // Registra falha
+                Scout.recordMessage(false);
             }
         });
     }
@@ -64,27 +66,98 @@ class MessageHandler {
                 
                 if (response === null) {
                     const welcomeResponse = await commands.menu.execute('', this.userStates.get(from), from);
-                    await this.sock.sendMessage(from, { text: welcomeResponse });
+                    await this.sendResponse(from, welcomeResponse);
                 } 
                 else if (Array.isArray(response)) {
-                    for (const item of response) {
-                        await this.sock.sendMessage(from, item);
-                    }
+                    await this.sendMultipleResponses(from, response);
                 }
                 else if (typeof response === 'object' && response !== null) {
-                    await this.sock.sendMessage(from, response);
+                    await this.sendResponse(from, response);
                 }
                 else {
-                    await this.sock.sendMessage(from, { text: response });
+                    await this.sendResponse(from, { text: response });
                 }
             } catch (error) {
                 console.error('Erro ao processar comando:', error);
-                await this.sock.sendMessage(from, { 
+                await this.sendResponse(from, { 
                     text: 'Desculpe, ocorreu um erro ao processar sua solicitação. Digite `Q` para voltar ao início. \n\n *Erro [mssgHdl_83-86]:* ' + error
                 });
             }
         } catch (error) {
             console.error('Erro no processamento da mensagem:', error);
+            throw error;
+        }
+    }
+
+    async sendResponse(from, response) {
+        try {
+            if (response.image) {
+                const processedResponse = await this.processImageMessage(response);
+                await this.sock.sendMessage(from, processedResponse);
+            } else if (response.document) {
+                const processedResponse = await this.processDocumentMessage(response);
+                await this.sock.sendMessage(from, processedResponse);
+            } else {
+                await this.sock.sendMessage(from, response);
+            }
+        } catch (error) {
+            console.error('Erro ao enviar resposta:', error);
+            throw error;
+        }
+    }
+
+    async sendMultipleResponses(from, responses) {
+        for (let i = 0; i < responses.length; i++) {
+            try {
+                await this.sendResponse(from, responses[i]);
+                
+                if (i < responses.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                }
+            } catch (error) {
+                console.error(`Erro ao enviar resposta ${i + 1}:`, error);
+            }
+        }
+    }
+
+    async processImageMessage(response) {
+        try {
+            const imagePath = path.resolve(response.image.url);
+            
+            if (!fs.existsSync(imagePath)) {
+                throw new Error(`Imagem não encontrada: ${imagePath}`);
+            }
+
+            const imageBuffer = fs.readFileSync(imagePath);
+            
+            return {
+                image: imageBuffer,
+                caption: response.caption || ''
+            };
+        } catch (error) {
+            console.error('Erro ao processar imagem:', error);
+            throw error;
+        }
+    }
+
+    async processDocumentMessage(response) {
+        try {
+            const documentPath = path.resolve(response.document.url);
+            
+            if (!fs.existsSync(documentPath)) {
+                throw new Error(`Documento não encontrado: ${documentPath}`);
+            }
+
+            const documentBuffer = fs.readFileSync(documentPath);
+            
+            return {
+                document: documentBuffer,
+                mimetype: response.mimetype || 'application/pdf',
+                fileName: response.fileName || path.basename(documentPath),
+                caption: response.caption || ''
+            };
+        } catch (error) {
+            console.error('Erro ao processar documento:', error);
             throw error;
         }
     }

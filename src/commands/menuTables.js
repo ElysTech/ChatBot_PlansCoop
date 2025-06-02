@@ -1,12 +1,12 @@
+const path = require('path');
+
 class MenuTabelas {
     static async execute(userInput, state) {
-        // Se o usuário digitar "Q" em qualquer submenu, retorna ao menu principal
         if (userInput && userInput.toLowerCase() === 'q') {
             console.log("menuTabelas -> Retornando ao menu principal...");
             return this.resetAndReturnToMain(state);
         }
 
-        // Se o usuário já viu as tabelas e enviou uma entrada, processa a escolha
         if (state.currentMenu === 'tabelas' && userInput) {
             return this.processUserChoice(userInput, state);
         }
@@ -17,12 +17,10 @@ class MenuTabelas {
     static processUserChoice(userInput, state) {
         const option = parseInt(userInput);
         
-        // Baseado na escolha do usuário, retorna o documento apropriado
         switch(option) {
             case 1:
                 this.resetState(state)
                 state.hasShownWelcome = false;
-                // Retorna um array de objetos de documento
                 return [
                     this.getPdfDocument("PME/PME BELO HORIZONTE 30 A 99 VIDAS.pdf", "Tabela:\n *_PME Belo Horizonte - 30 a 99 pessoas._*"),
                     this.getPdfDocument("PME/SUPER SIMPLES BH 2 A 29 VIDAS.pdf", "Tabela:\n *_SUPER SIMPLES Belo Horizonte - 2 a 29 pessoas._*"),
@@ -34,7 +32,6 @@ class MenuTabelas {
             case 2:
                 this.resetState(state)
                 state.hasShownWelcome = false;
-                // Retorna um array de objetos de documento
                 return [
                     this.getPdfDocument("PME/PME TRIANGULO MINEIRO 30 A 99 VIDAS.pdf", "Tabela:\n *_PME Triângulo Mineiro - 30 a 99 pessoas._*"),
                     this.getPdfDocument("PME/SUPER SIMPLES TRIANGULO MINEIRO 2 A 29 VIDAS.pdf", "Tabela:\n *_SUPER SIMPLES Triângulo Mineiro- 2 a 29 pessoas._*"),
@@ -49,9 +46,8 @@ class MenuTabelas {
     }
 
     static getPdfDocument(filename, title) {
-        // Retorna um objeto de documento no formato que o Baileys espera
         return {
-            document: { url: `./DOCS/pdfs/${filename}` }, // Caminho para o PDF
+            document: { url: path.resolve(`./DOCS/pdfs/${filename}`) },
             mimetype: 'application/pdf',
             fileName: filename,
             caption: `📄 ${title}`
@@ -69,7 +65,6 @@ class MenuTabelas {
     }
 
     static resetAndReturnToMain(state) {
-        // Reseta o estado
         Object.assign(state, {
             currentMenu: 'main',
             hasShownWelcome: false,
@@ -77,7 +72,6 @@ class MenuTabelas {
             hasSeenTable: false
         });
         
-        // Retorna null para indicar que deve mostrar mensagem de boas-vindas
         return null;
     }
 

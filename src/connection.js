@@ -15,6 +15,10 @@ class WhatsAppConnection {
     static messageCache = new NodeCache({ stdTTL: 300 });
     static reconnectTimeout = null;
     static pingInterval = null;
+    static consecutivePingFailures = 0;
+    static maxPingFailures = 3;
+    static connectionLockTimeout = null;
+    static isReconnecting = false;
 
     static RealTime() {
         let RT = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
@@ -22,8 +26,14 @@ class WhatsAppConnection {
     }
 
     static async initialize() {
+        if (this.isReconnecting) {
+            console.log(this.RealTime() + "🔄 Reconexão já em andamento, ignorando...");
+            return;
+        }
+
+        this.isReconnecting = true;
+        
         try {
-            // Limpa timeouts pendentes
             this.clearAllIntervals();
             
             const { version, isLatest } = await fetchLatestBaileysVersion();
@@ -50,17 +60,25 @@ class WhatsAppConnection {
                 printQRInTerminal: false,
                 browser: ['Iris Bot', 'Safari', '4.0.0'],
                 connectTimeoutMs: 60000,
-                defaultQueryTimeoutMs: 0,
-                keepAliveIntervalMs: 30000,
+                defaultQueryTimeoutMs: 30000,
+                keepAliveIntervalMs: 25000,
                 emitOwnEvents: true,
-                fireInitQueries: false,
+                fireInitQueries: true,
                 generateHighQualityLinkPreview: false,
                 syncFullHistory: false,
-                markOnlineOnConnect: true,
-                retryRequestDelayMs: 250,
-                maxMsgRetryCount: 5,
+                markOnlineOnConnect: false,
+                retryRequestDelayMs: 1000,
+                maxMsgRetryCount: 3,
                 qrTimeout: 60000,
-                // Configurações do takeshi-bot
+                shouldIgnoreJid: jid => jid === 'status@broadcast',
+                shouldSyncHistoryMessage: () => false,
+                getMessage: async (key) => {
+                    if (this.messageCache.has(key.id)) {
+                        return this.messageCache.get(key.id);
+                    }
+                    return { conversation: 'placeholder' };
+                },
+                msgRetryCounterMap: {},
                 patchMessageBeforeSending: (message) => {
                     const requiresPatch = !!(
                         message.buttonsMessage ||
@@ -81,14 +99,7 @@ class WhatsAppConnection {
                         };
                     }
                     return message;
-                },
-                getMessage: async (key) => {
-                    if (this.messageCache.has(key.id)) {
-                        return this.messageCache.get(key.id);
-                    }
-                    return { conversation: 'placeholder' };
-                },
-                msgRetryCounterMap: {}
+                }
             });
 
             this.setupConnectionHandlers(this.sock, saveCreds);
@@ -96,12 +107,12 @@ class WhatsAppConnection {
         } catch (error) {
             console.error(this.RealTime() + "❌ Erro ao inicializar:", error);
             Scout.recordFailure();
+            this.isReconnecting = false;
             this.scheduleReconnect(5000);
         }
     }
 
     static setupConnectionHandlers(sock, saveCreds) {
-        // Connection update handler
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
 
@@ -123,10 +134,8 @@ class WhatsAppConnection {
             }
         });
 
-        // Salva credenciais
         sock.ev.on('creds.update', saveCreds);
         
-        // Cache de mensagens enviadas
         sock.ev.on('messages.sent', (msg) => {
             const m = msg.messages[0];
             if (m && m.key) {
@@ -134,34 +143,34 @@ class WhatsAppConnection {
             }
         });
 
-        // Tratamento robusto de erros
         sock.ev.on('error', (error) => {
             console.error(this.RealTime() + "❌ Erro do socket:", error);
             Scout.recordFailure();
             
-            // Reconecta em erros críticos
-            if (error.output?.statusCode >= 500) {
-                this.scheduleReconnect(2000);
+            if (error.output?.statusCode >= 500 || error.message?.includes('stream')) {
+                this.handleStreamError();
             }
         });
 
-        // Handler para chamadas (evita travamentos)
         sock.ev.on('call', async (calls) => {
             for (const call of calls) {
                 if (call.status === 'offer') {
-                    await sock.rejectCall(call.id, call.from);
-                    console.log(this.RealTime() + `📞 Chamada rejeitada de ${call.from}`);
+                    try {
+                        await sock.rejectCall(call.id, call.from);
+                        console.log(this.RealTime() + `📞 Chamada rejeitada de ${call.from}`);
+                    } catch (error) {
+                        console.error('Erro ao rejeitar chamada:', error);
+                    }
                 }
             }
         });
 
-        // Limpa cache periodicamente
         setInterval(() => {
             const keys = this.messageCache.keys();
             if (keys.length > 500) {
                 keys.slice(0, 250).forEach(key => this.messageCache.del(key));
             }
-        }, 300000); // 5 minutos
+        }, 300000);
 
         const messageHandler = new MessageHandler(sock);
         messageHandler.initialize();
@@ -169,7 +178,9 @@ class WhatsAppConnection {
 
     static handleConnection() {
         this.isConnected = true;
+        this.isReconnecting = false;
         this.reconnectAttempts = 0;
+        this.consecutivePingFailures = 0;
         this.clearReconnectTimeout();
         
         console.log(this.RealTime() + "✅ Bot conectado!");
@@ -178,16 +189,29 @@ class WhatsAppConnection {
         
         this.startHeartbeat();
         this.startPingMonitor();
+        this.startConnectionMonitor();
     }
 
     static handleDisconnection(lastDisconnect) {
         this.isConnected = false;
         this.clearAllIntervals();
+        this.consecutivePingFailures = 0;
         Scout.recordFailure();
         
         const reason = new Boom(lastDisconnect?.error)?.output?.statusCode;
         
-        // Decisão inteligente de reconexão
+        if (reason === 503) {
+            console.log(this.RealTime() + '⚠️ Servidor indisponível (503), aguardando 15s...');
+            this.scheduleReconnect(15000);
+            return;
+        }
+
+        if (reason === 408 || reason === 502 || reason === 504) {
+            console.log(this.RealTime() + `⚠️ Timeout/Gateway error (${reason}), aguardando 8s...`);
+            this.scheduleReconnect(8000);
+            return;
+        }
+        
         const shouldReconnect = 
             reason !== DisconnectReason.loggedOut && 
             reason !== DisconnectReason.badSession &&
@@ -203,9 +227,8 @@ class WhatsAppConnection {
             this.reconnectAttempts++;
             Scout.recordReconnection();
             
-            // Backoff exponencial com jitter
-            const baseDelay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
-            const jitter = Math.random() * 1000;
+            const baseDelay = Math.min(2000 * Math.pow(1.5, this.reconnectAttempts), 30000);
+            const jitter = Math.random() * 2000;
             const delay = baseDelay + jitter;
             
             console.log(this.RealTime() + `🔄 Reconectando (${this.reconnectAttempts}/${this.maxReconnectAttempts}) em ${Math.round(delay/1000)}s...`);
@@ -224,11 +247,10 @@ class WhatsAppConnection {
             
             try {
                 await this.sock.sendPresenceUpdate('available');
-                await this.sock.readMessages([]);
             } catch (error) {
-                // Silencia erros esperados
+                console.log(this.RealTime() + '⚠️ Heartbeat falhou');
             }
-        }, 30000);
+        }, 25000);
     }
 
     static startPingMonitor() {
@@ -239,30 +261,69 @@ class WhatsAppConnection {
             
             try {
                 const start = Date.now();
-                await this.sock.query({
-                    tag: 'iq',
-                    attrs: {
-                        to: '@s.whatsapp.net',
-                        type: 'get',
-                        xmlns: 'w:ping'
-                    },
-                    content: []
-                });
-                const latency = Date.now() - start;
+                await Promise.race([
+                    this.sock.query({
+                        tag: 'iq',
+                        attrs: {
+                            to: '@s.whatsapp.net',
+                            type: 'get',
+                            xmlns: 'w:ping'
+                        },
+                        content: []
+                    }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Ping timeout')), 10000))
+                ]);
                 
-                // Reconecta se latência muito alta
-                if (latency > 3500) {
+                const latency = Date.now() - start;
+                this.consecutivePingFailures = 0;
+                
+                if (latency > 5000) {
                     console.log(this.RealTime() + `⚠️ Latência alta: ${latency}ms`);
-                    this.scheduleReconnect(1000);
+                }
+                
+            } catch (error) {
+                this.handlePingFailure();
+            }
+        }, 90000);
+    }
+
+    static handlePingFailure() {
+        this.consecutivePingFailures++;
+        
+        if (this.consecutivePingFailures >= this.maxPingFailures) {
+            console.log(this.RealTime() + `⚠️ ${this.consecutivePingFailures} pings consecutivos falharam, reconectando...`);
+            this.consecutivePingFailures = 0;
+            this.scheduleReconnect(3000);
+        } else {
+            console.log(this.RealTime() + `⚠️ Ping falhou (${this.consecutivePingFailures}/${this.maxPingFailures})`);
+        }
+    }
+
+    static startConnectionMonitor() {
+        setInterval(() => {
+            if (!this.isConnected || !this.sock || this.isReconnecting) return;
+            
+            try {
+                if (this.sock.ws && this.sock.ws.readyState !== 1) {
+                    console.log(this.RealTime() + '⚠️ WebSocket desconectado, reconectando...');
+                    this.scheduleReconnect(2000);
                 }
             } catch (error) {
-                console.log(this.RealTime() + '⚠️ Ping falhou, verificando conexão...');
-                this.scheduleReconnect(2000);
+                console.log(this.RealTime() + '⚠️ Erro no monitor de conexão:', error.message);
             }
-        }, 60000); // A cada minuto
+        }, 30000);
+    }
+
+    static handleStreamError() {
+        console.log(this.RealTime() + '⚠️ Stream error detectado, reconectando imediatamente...');
+        this.isConnected = false;
+        this.clearAllIntervals();
+        this.scheduleReconnect(1000);
     }
 
     static scheduleReconnect(delay) {
+        if (this.isReconnecting) return;
+        
         this.clearReconnectTimeout();
         this.reconnectTimeout = setTimeout(() => {
             this.initialize();
@@ -308,9 +369,14 @@ class WhatsAppConnection {
 
     static async disconnect() {
         this.isConnected = false;
+        this.isReconnecting = false;
         this.clearAllIntervals();
         if (this.sock) {
-            await this.sock.logout();
+            try {
+                await this.sock.logout();
+            } catch (error) {
+                console.error('Erro no logout:', error);
+            }
             this.sock = null;
         }
     }
