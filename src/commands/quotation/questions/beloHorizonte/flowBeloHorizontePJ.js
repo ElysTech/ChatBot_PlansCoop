@@ -1,6 +1,7 @@
 // Importa a tabela de preços
 const tabelaHappyVidaPJ = require('../../table/pessoajuridica/tableBeloHorizonte');
 const sct = require('../../../../middlewares/scout');
+const path = require('path');
 
 class FlowBeloHorizontePJ {
     static async iniciar(state) {

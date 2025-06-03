@@ -1,5 +1,6 @@
 const tabelaHappyVidaPF = require('../../table/pessoafisica/tableBeloHorizonte');
 const sct = require('../../../../middlewares/scout');
+const path = require('path');
 
 class FlowBeloHorizontePF {
     static async iniciar(state) {

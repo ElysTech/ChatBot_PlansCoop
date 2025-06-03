@@ -1,5 +1,7 @@
 const tabelaHappyVidaPF = require('../../table/pessoafisica/tableUberlandia');
 const sct = require('../../../../middlewares/scout');
+const path = require('path');
+
 
 class FlowUberlandiaPF {
     static async iniciar(state) {

@@ -1,6 +1,8 @@
 //Importa a tabela de preços:
 const tabelaHappyVidaPJ = require('../../table/pessoajuridica/tableUberlandia');
 const sct = require('../../../../middlewares/scout');
+const path = require('path');
+
 
 class FlowUberlandiaPJ {
     static async iniciar(state) {
