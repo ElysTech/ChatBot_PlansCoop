@@ -1,3 +1,5 @@
+process.env.TZ = 'America/Sao_Paulo';
+
 const WhatsAppConnection = require('./src/connection');
 const Scout = require('./src/middlewares/scout');
 

@@ -29,7 +29,7 @@ class Scout {
         let upTime = this.getUptime();
         response += `*🚀 SISTEMA*\n`;
         response += `*Uptime:* ${upTime.error ? upTime.message : upTime.formatted}\n`;
-        response += `*Versão:* 0.5.0\n`;
+        response += `*Versão:* 1.3.0\n`;
         response += `*Status:* ${this.getSystemStatus()}\n\n`;
 
         // Métricas de uso detalhadas

@@ -1,3 +1,6 @@
+process.env.TZ = 'America/Sao_Paulo';
+
+
 const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('baileys');
 const P = require('pino');
 const { Boom } = require('@hapi/boom');
