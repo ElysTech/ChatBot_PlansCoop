@@ -1,4 +1,5 @@
 const path = require('path');
+const Scout = require('../middlewares/scout.js');
 
 const MENU_MODULES = {
     1: { path: './quotation/menuCotacao', name: 'cotacao' },

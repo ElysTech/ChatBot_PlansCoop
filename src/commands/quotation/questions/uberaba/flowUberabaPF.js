@@ -1,6 +1,6 @@
 const tabelaHappyVidaPF = require('../../table/pessoafisica/tableUberaba');
-const sct = require('../../../../middlewares/scout');
 const path = require('path');
+const Scout = require('../../../../middlewares/scout');
 
 class FlowUberabaPF {
     static async iniciar(state) {
@@ -186,9 +186,13 @@ class FlowUberabaPF {
             
             mensagem += "\n*Detalhamento por idade:*\n";
             cliente.detalhamento.forEach(item => {
-                mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
+                if (cliente.cobertura === 'Ambulatorial') {
+                    item.valor = item.valor.toFixed(2);
+                } else if (cliente.cobertura === 'Completo') {
+                   mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)} + (${valorIdade += tabelaHappyVidaPF.Uberaba[cliente.cobertura]['Planos_Odontológicos']})\n`;
+                }
             });
-            sct.addQuotation();
+            Scout.addQuotation();
             mensagem += `\n*VALOR TOTAL:* R$ ${cliente.valorTotal.toFixed(2)}\n\n`;
             mensagem += "✅ Deseja confirmar esta cotação? (S/N)";
             
@@ -271,6 +275,12 @@ class FlowUberabaPF {
                 }
                 
                 detalhamento.push({ idade, valor: valorIdade });
+
+                if (cliente.cobertura === 'Completo') {
+                    // Adicional o valor do plano adontológico de cada pessoa no valor total
+                    valorTotal += (valorIdade + tabelaHappyVidaPF.Uberaba[cliente.cobertura]['Planos_Odontológicos']);
+                }
+
                 valorTotal += valorIdade;
             }
             

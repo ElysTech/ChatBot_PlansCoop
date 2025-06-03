@@ -1,5 +1,5 @@
 const tabelaHappyVidaPF = require('../../table/pessoafisica/tableBeloHorizonte');
-const sct = require('../../../../middlewares/scout');
+const Scout = require('../../../../middlewares/scout');
 const path = require('path');
 
 class FlowBeloHorizontePF {
@@ -205,9 +205,9 @@ class FlowBeloHorizontePF {
             
             mensagem += "\n*Detalhamento por idade:*\n";
             cliente.detalhamento.forEach(item => {
-                mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
+                mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)} + (${tabelaHappyVidaPF.Belo_Horizonte[cliente.cobertura]['Planos_Odontológicos']})\n`;
             });
-            sct.addQuotation();
+            Scout.addQuotation();
             mensagem += `\n*VALOR TOTAL:* R$ ${cliente.valorTotal.toFixed(2)}\n\n`;
             mensagem += "✅ Deseja confirmar esta cotação? (S/N)";
             
@@ -285,9 +285,10 @@ class FlowBeloHorizontePF {
                 } else {
                     valorIdade = tabela['59+'];
                 }
-                
+
                 detalhamento.push({ idade, valor: valorIdade });
-                valorTotal += valorIdade;
+                // Adicional o valor do plano adontológico de cada pessoa no valor total
+                valorTotal += (valorIdade += tabelaHappyVidaPF.Belo_Horizonte[cliente.cobertura]['Planos_Odontológicos']);
             }
             
             return { valorTotal, detalhamento };
