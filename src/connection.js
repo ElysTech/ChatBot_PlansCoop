@@ -51,11 +51,27 @@ class WhatsAppConnection {
                 console.log(this.RealTime() + "✅ Bot conectado com sucesso!");
                 Scout.resetQuotation();
                 Scout.setStartedTime(new Date());
+                
+                // Inicia monitoramento de recursos
+                Scout.startResourceMonitoring();
             }
         });
 
+        // Tracking de erros de envio
+        const originalSendMessage = sock.sendMessage;
+        sock.sendMessage = async (...args) => {
+            try {
+                const result = await originalSendMessage.apply(sock, args);
+                return result;
+            } catch (error) {
+                Scout.recordFailure();
+                throw error;
+            }
+        };
+
         sock.ev.on('creds.update', saveCreds);
         
+        // Inicializa o handler de mensagens
         const messageHandler = new MessageHandler(sock);
         messageHandler.initialize();
     }
