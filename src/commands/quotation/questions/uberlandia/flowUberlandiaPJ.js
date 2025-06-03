@@ -318,7 +318,7 @@ class FlowUberlandiaPJ {
             return [
                 {text: mensagem},
                 {
-                    document: { url: `./docs/pdfs/REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG.pdf` }, // Caminho para o PDF
+                    document: { url: path.resolve('./docs/pdfs/REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG.pdf') }, // Caminho para o PDF
                     mimetype: 'application/pdf',
                     fileName: `REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG`,
                     caption: `📄 *REDE DE ATENDIMENTO BH - RM HAPVIDA NDI MG*`

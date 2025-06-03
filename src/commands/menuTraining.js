@@ -1,3 +1,5 @@
+const path = require('path');
+
 class MenuTreinamento {
     
     static async execute(userInput, state) {
@@ -5,31 +7,39 @@ class MenuTreinamento {
             return this.resetAndReturnToMain(state);
         }
 
-        // Se não houver input, exibe o menu
         if (!userInput) {
             return this.getMenu();
         }
 
         const option = parseInt(userInput);
 
-        //* RETORNA AS INFORMAÇÕES DO TREINAMENTO SELECIONADO
         if (!isNaN(option)){
             switch (option){
                 case 1:
                     console.log('menuTreinamento -> Treinamento selecionado: 1');
                     return {
-                        image: {url: `./docs/images/Hapminas.jpeg`},
+                        image: { url: path.resolve('./docs/images/Hapminas.jpeg') },
                         caption: (`💼 *_INFORMAÇÕES DO TREINAMENTO:_*\n\n  *Nome:* Treinamento 1\n  *Descrição:* Descrição do Treinamento 1\n  *Data:* 01/05/2025\n  *Horário:* 10:00\n  *Local:* Local do Treinamento 1\n  *Instrutores:* Instrutor 1, Instrutor 2\n  *Participantes:* Participante 1, Participante 2\n  *Valor:* R$ 100,00\n  *Increva-se:* www.example.com/treinamento1\n\n _Digite *Q* para voltar ao menu inicial._`)
                     }
                     
                 default:
                     console.log('menuTreinamento -> Opção inválida. Por favor, escolha uma opção válida.');
-                    return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" , this.getMenu();
+                    return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" + this.getMenu();
             }
             
         } else {
-            
+            return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" + this.getMenu();
         }
+    }
+
+    static resetAndReturnToMain(state) {
+        Object.assign(state, {
+            currentMenu: 'main',
+            hasShownWelcome: false,
+            selectedCity: null,
+            previousInput: null
+        });
+        return null;
     }
 
     static resetState(state) {

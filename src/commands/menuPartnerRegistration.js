@@ -1,5 +1,14 @@
 const { text } = require("express");
 
+const suport_Vcard = (
+    'BEGIN:VCARD\n'
+    + 'VERSION:3.0\n' 
+    + 'FN:Hapminas Comercial\n'
+    + 'ORG:Hapminas Comercial\n'
+    + 'TEL;type=CELL;type=VOICE;waid=553193661077:+55 3193661077\n'
+    + 'END:VCARD'
+);
+
 parceiro = new Object();
 class MenuParceiro {
     static async execute(userInput, state) {
@@ -33,16 +42,27 @@ class MenuParceiro {
 
                 case 'finish':
                     if (lowerCaseUserInput === 's') {
-                        parceiro.etapaAnterior = 'saved';
-                        return `💼 *_INFORMAÇÕES SALVAS:_*\n\n  *Nome:* ${parceiro.nome}\n  *CPF:* ${parceiro.cpf}\n  *Telefone:* ${parceiro.telefone}\n  *Endereço:* ${parceiro.endereco} \n\n\n _Digite "*Q*" para voltar ao menu inicial._`;
-                            
+                        this.resetState(state);
+                        return [
+                            {
+                                contacts: { 
+                                    displayName: 'Hapminas Comercial',
+                                    contacts: [{vcard: suport_Vcard}]
+                                }
+                            },
+                            {
+                                text: "✅ *Cadastrado com sucesso no sistema!*\n\n💼 Aqui está o contato do nosso suporte.\nLigue para nós ou envie uma mensagem!"
+                            },
+                            {
+                                text: "_Atendimento Encerrado_\n👋 Obrigado por usar nossos serviços. Até logo!"
+                            }
+                        ];
                     } else if (lowerCaseUserInput === 'n') {
                         this.resetState(state);
                         return null;
                     } else {
-                        return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" , this.getMenu();
+                        return "⚠️ Opção inválida. Por favor, escolha uma opção válida:\n\n" + this.getMenu();
                     }
-
             }
         }
 
@@ -70,7 +90,7 @@ class MenuParceiro {
     }
 
     static getMenu() {
-        return "Deseja cadastrar um parceiro? [s/n]: ";
+        return "Deseja se cadastrar um parceiro produtor? [s/n]: ";
     }
 }
 module.exports = MenuParceiro;

@@ -1,4 +1,5 @@
-// menu.js
+const path = require('path');
+
 const MENU_MODULES = {
     1: { path: './quotation/menuCotacao', name: 'cotacao' },
     2: { path: './menuTables', name: 'tabelas' },
@@ -11,7 +12,6 @@ const MENU_MODULES = {
 
 class Menu {
     static async execute(userInput, state) {
-        //Bloqueia o bot para não responder para grupos
         if (userInput.from && userInput.from.endsWith('@g.us')) {
             return;
         }
@@ -19,25 +19,22 @@ class Menu {
             return;
         }
         
-        // Se for a primeira interação ou estado resetado, mostra mensagem de boas-vindas
         if (!state.hasShownWelcome) {
             state.hasShownWelcome = true;
             return {
-                image: {url: `./docs/images/Hapminas.jpeg`},
+                image: { url: path.resolve('./docs/images/Hapminas.jpeg') },
                 caption: "Oi, sou a Íris, assistente virtual Hapminas 🤖💜\n\n" + this.getMainMenu()
             };
         }
 
-        // Se estiver em algum submenu e digitar Q
         if (state.currentMenu !== 'main' && userInput.toLowerCase() === 'q') {
             this.resetState(state);
             return {
-                image: {url: `./docs/images/Hapminas.jpeg`},
+                image: { url: path.resolve('./docs/images/Hapminas.jpeg') },
                 caption: "Oi, sou a Íris, assistente virtual Hapminas 🤖💜\n\n" + this.getMainMenu()
             };
         }
 
-        // Se estiver em algum submenu
         if (state.currentMenu !== 'main') {
             try {
                 const currentModule = Object.values(MENU_MODULES).find(m => 
@@ -48,12 +45,11 @@ class Menu {
                     const menuModule = require(currentModule.path);
                     const response = await menuModule.execute(userInput, state);
                     
-                    // Se o módulo retornar null, significa que devemos mostrar a mensagem de boas-vindas
                     if (response === null) {
                         this.resetState(state);
                         
                         return {
-                            image: {url: `./docs/images/Hapminas.jpeg`},
+                            image: { url: path.resolve('./docs/images/Hapminas.jpeg') },
                             caption: "Oi, sou a Íris, assistente virtual Hapminas 🤖💜\n\n" + this.getMainMenu()
                         };
                     }
@@ -71,7 +67,7 @@ class Menu {
     static resetState(state) {
         Object.assign(state, {
             currentMenu: 'main',
-            hasShownWelcome: true, // Mantém como true para evitar dupla mensagem
+            hasShownWelcome: true,
             selectedCity: null,
             previousInput: null
         });
@@ -86,7 +82,7 @@ class Menu {
 
         if (option === 7) {
             this.resetState(state);
-            state.hasShownWelcome = false; // Força mostrar boas-vindas na próxima interação
+            state.hasShownWelcome = false;
             return "👋 Obrigado por usar nossos serviços. Até logo!";
         }
 

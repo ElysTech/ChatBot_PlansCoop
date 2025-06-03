@@ -2,20 +2,14 @@ const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = requi
 const P = require('pino');
 const { Boom } = require('@hapi/boom');
 const MessageHandler = require('./middlewares/messageHandler');
-const qrcode = require('qrcode-terminal'); // 🔹 Biblioteca para exibir QR code no terminal
+const qrcode = require('qrcode-terminal');
 const Scout = require('./middlewares/scout');
 
-
-
-
 class WhatsAppConnection {
-    /**
-     * @returns {string} Retorna a data e hora atual no formato brasileiro
-     */
     static RealTime() {
         let RT = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
         let RTstring = (`[` + RT +`] `);
-        return RTstring; //retorna a data e hora atual
+        return RTstring;
     }
 
     static async initialize() {
@@ -34,7 +28,6 @@ class WhatsAppConnection {
         sock.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect, qr } = update;
 
-            // ✅ Exibir QR Code manualmente quando necessário
             if (qr) {
                 console.log(this.RealTime() + "📌 Escaneie o QR Code abaixo para conectar:");
                 qrcode.generate(qr, { small: true });
@@ -45,14 +38,16 @@ class WhatsAppConnection {
 
                 if (shouldReconnect) {
                     console.log(this.RealTime() + "🔄 Tentando reconectar...");
+                    Scout.recordReconnection();
+                    Scout.recordFailure();
                     this.initialize();
                 } else {
                     console.log(this.RealTime() + "🚫 Desconectado permanentemente. É necessário excluir a autenticação e conectar novamente.");
+                    Scout.recordFailure();
                 }
             }
 
             if (connection === 'open') {
-                
                 console.log(this.RealTime() + "✅ Bot conectado com sucesso!");
                 Scout.resetQuotation();
                 Scout.setStartedTime(new Date());
@@ -61,7 +56,6 @@ class WhatsAppConnection {
 
         sock.ev.on('creds.update', saveCreds);
         
-        // Inicializa o handler de mensagens
         const messageHandler = new MessageHandler(sock);
         messageHandler.initialize();
     }
