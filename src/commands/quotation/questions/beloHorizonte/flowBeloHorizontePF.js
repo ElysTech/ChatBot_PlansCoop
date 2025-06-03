@@ -213,6 +213,7 @@ class FlowBeloHorizontePF {
             
             return mensagem;
         } catch (error) {
+            Scout.recordFailure('flow_error_bh_pf');
             console.error("Erro ao processar idades:", error);
             return "⚠️ Ocorreu um erro ao calcular a cotação. Por favor, tente novamente ou digite 'Q' para voltar ao menu principal.";
         }
@@ -291,6 +292,7 @@ class FlowBeloHorizontePF {
             
             return { valorTotal, detalhamento };
         } catch (error) {
+            Scout.recordFailure('flow_error_bh_pf');
             console.error("Erro ao calcular cotação:", error);
             return { 
                 valorTotal: 0, 
@@ -327,10 +329,12 @@ class FlowBeloHorizontePF {
             try {
                 return tabela;
             } catch (error) {
+                Scout.recordFailure('flow_error_bh_pf');
                 console.error('L311: Erro ao obter tabela de preços:', error);
                 return 'Erro ao obter tabela de preços. Reinicie o processo.';
             }
         } catch (error) {
+            Scout.recordFailure('flow_error_bh_pf');
             console.error('L315: Erro ao obter tabela de preços:', error);
             return null;
         }

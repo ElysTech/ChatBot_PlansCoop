@@ -299,6 +299,7 @@ class FlowUberabaPJ {
 
             return mensagem;
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberaba_pj');
             console.error("Erro ao processar idades:", error);
             return "⚠️ processarIdades: Ocorreu um erro ao calcular a cotação. Por favor, tente novamente ou digite 'Q' para voltar ao menu principal.";
         }
@@ -380,6 +381,7 @@ class FlowUberabaPJ {
 
             return { valorTotal, detalhamento };
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberaba_pj');
             console.error("Erro ao calcular cotação:", error);
             throw new Error("Falha no cálculo da cotação");
         }
@@ -445,6 +447,7 @@ class FlowUberabaPJ {
             
             return tabela;
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberaba_pj');
             console.error('Erro ao obter tabela de preços:', error);
             throw error;
         }

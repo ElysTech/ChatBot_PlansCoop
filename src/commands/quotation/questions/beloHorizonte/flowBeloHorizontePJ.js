@@ -283,6 +283,7 @@ class FlowBeloHorizontePJ {
                 }
             ];
         } catch (error) {
+            Scout.recordFailure('flow_error_bh_pj');
             console.error("Erro ao processar idades:", error);
             return "⚠️ Ocorreu um erro ao calcular a cotação. Por favor, tente novamente ou digite 'Q' para voltar ao menu principal.";
         }
@@ -353,6 +354,7 @@ class FlowBeloHorizontePJ {
 
             return { valorTotal, detalhamento };
         } catch (error) {
+            Scout.recordFailure('flow_error_bh_pj');
             console.error("Erro ao calcular cotação:", error);
             return {
                 valorTotal: 0,
@@ -370,6 +372,7 @@ class FlowBeloHorizontePJ {
             try {
                 basePath = tabelaHappyVidaPJ.PJ.Belo_Horizonte[cliente.qtdBeneficiario][cliente.tipoPlano][cliente.coparticipacao][cliente.segmentacao];
             } catch (error) {
+                Scout.recordFailure('flow_error_bh_pj');
                 console.log("L362: Erro ao acessar a tabela de preços:", error);
                 return "Tabela não encontrada";
             }
@@ -383,6 +386,7 @@ class FlowBeloHorizontePJ {
                     tabela = basePath[cliente.acomodacao];
                 }
             } catch (error) {
+                Scout.recordFailure('flow_error_bh_pj');
                 console.log("L375: Erro ao acessar a tabela de preços:", error);
                 return "Tabela não encontrada";
             }
@@ -402,6 +406,7 @@ class FlowBeloHorizontePJ {
             
             return tabela;
         } catch (error) {
+            Scout.recordFailure('flow_error_bh_pj');
             console.error('Erro ao obter tabela de preços:', error);
             return null;
         }

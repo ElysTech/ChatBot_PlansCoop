@@ -21,7 +21,7 @@ class MessageHandler {
             } catch (error) {
                 console.error('Erro no handler de mensagens:', error);
                 Scout.recordMessage(false);
-                Scout.recordFailure();
+                Scout.recordFailure('message_handler_error');
             }
         });
     }
@@ -88,7 +88,7 @@ class MessageHandler {
             } catch (error) {
                 console.error('Erro ao processar comando:', error);
                 success = false;
-                Scout.recordFailure();
+                Scout.recordFailure('message_handler_error');
                 await this.sock.sendMessage(from, { 
                     text: 'Desculpe, ocorreu um erro ao processar sua solicitação. Digite `Q` para voltar ao início. \n\n *Erro [mssgHdl_83-86]:* ' + error
                 });
@@ -96,7 +96,7 @@ class MessageHandler {
         } catch (error) {
             console.error('Erro no processamento da mensagem:', error);
             success = false;
-            Scout.recordFailure();
+            Scout.recordFailure('message_handler_error');
             throw error;
         } finally {
             // Registra a métrica da mensagem apenas se não for do bot

@@ -202,6 +202,7 @@ class FlowUberabaPF {
                 }
             ];
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberaba_pf');
             console.error("L192: Erro ao processar idades\n", error);
             return "⚠️ Ocorreu um erro ao calcular a cotação. Por favor, tente novamente ou digite 'Q' para voltar ao menu principal.";
         }
@@ -275,6 +276,7 @@ class FlowUberabaPF {
             
             return { valorTotal, detalhamento };
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberaba_pf');
             console.error("Erro ao calcular cotação:", error);
             return { 
                 valorTotal: 0, 
@@ -311,10 +313,12 @@ class FlowUberabaPF {
             try {
                 return tabela;
             } catch (error) {
+                Scout.recordFailure('flow_error_Uberaba_pf');
                 console.error('L302: Erro ao obter tabela de preços:', error);
                 return 'Erro ao obter tabela de preços. Reinicie o processo.';
             }
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberaba_pf');
             console.error('L306: Erro ao obter tabela de preços:', error);
             return null;
         }

@@ -299,6 +299,7 @@ class FlowUberlandiaPJ {
 
             return mensagem;
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberlandia_pj');
             console.error("Erro ao processar idades:", error);
             return "⚠️ Ocorreu um erro ao calcular a cotação. Por favor, tente novamente ou digite 'Q' para voltar ao menu principal.";
         }
@@ -380,6 +381,7 @@ class FlowUberlandiaPJ {
 
             return { valorTotal, detalhamento };
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberlandia_pj');
             console.error("Erro ao calcular cotação:", error);
             throw new Error("Falha no cálculo da cotação");
         }
@@ -445,6 +447,7 @@ class FlowUberlandiaPJ {
             
             return tabela;
         } catch (error) {
+            Scout.recordFailure('flow_error_Uberlandia_pj');
             console.error('Erro ao obter tabela de preços:', error);
             throw error;
         }

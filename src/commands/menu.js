@@ -56,6 +56,7 @@ class Menu {
                     return response;
                 }
             } catch (error) {
+                Scout.recordFailure('error_in_menu_module');
                 console.error('Erro ao executar módulo:', error);
                 return "⚠️ Desculpe, ocorreu um erro ao processar sua solicitação. Digite `Q` para voltar ao início. \n *Erro [menu_57-59]*";
             }
@@ -93,6 +94,7 @@ class Menu {
                 state.currentMenu = menuModule.name;
                 return module.getMenu(state);
             } catch (error) {
+                Scout.recordFailure('error_in_menu_module');
                 console.error('Erro ao carregar módulo:', error);
                 return "⚠️ Desculpe, esta opção não está indisponível ainda.";
             }
