@@ -55,7 +55,7 @@ const tabelaHappyVidaPF = {
           }
         }
       },
-      "Planos_Odontológicos": 18.54
+      "Planos_Odontológicos": 23.59
     },
     "Completo": {
       "Nosso Plano": {
@@ -278,7 +278,7 @@ const tabelaHappyVidaPF = {
           }
         }
       },
-      "Planos_Odontológicos": 73.03
+      "Planos_Odontológicos": 23.59
     }
   },
 }

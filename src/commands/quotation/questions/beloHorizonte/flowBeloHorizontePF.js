@@ -205,7 +205,7 @@ class FlowBeloHorizontePF {
             
             mensagem += "\n*Detalhamento por idade:*\n";
             cliente.detalhamento.forEach(item => {
-                mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)} + (${tabelaHappyVidaPF.Belo_Horizonte[cliente.cobertura]['Planos_Odontológicos']})\n`;
+                mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
             });
             Scout.addQuotation();
             mensagem += `\n*VALOR TOTAL:* R$ ${cliente.valorTotal.toFixed(2)}\n\n`;
@@ -286,9 +286,10 @@ class FlowBeloHorizontePF {
                     valorIdade = tabela['59+'];
                 }
 
+                valorIdade += tabelaHappyVidaPF.Belo_Horizonte[cliente.cobertura]['Planos_Odontológicos']
+
                 detalhamento.push({ idade, valor: valorIdade });
-                // Adicional o valor do plano adontológico de cada pessoa no valor total
-                valorTotal += (valorIdade += tabelaHappyVidaPF.Belo_Horizonte[cliente.cobertura]['Planos_Odontológicos']);
+                valorTotal += valorIdade
             }
             
             return { valorTotal, detalhamento };

@@ -142,7 +142,7 @@ const tabelaHappyVidaPF = {
           }
         }
       },
-      "Planos_Odontológicos": 73.03
+      "Planos_Odontológicos": 23.59
     }
   }
 }

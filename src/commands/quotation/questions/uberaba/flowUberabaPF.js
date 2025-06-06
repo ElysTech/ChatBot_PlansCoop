@@ -189,7 +189,7 @@ class FlowUberabaPF {
                 if (cliente.cobertura === 'Ambulatorial') {
                     item.valor = item.valor.toFixed(2);
                 } else if (cliente.cobertura === 'Completo') {
-                   mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)} + (${valorIdade += tabelaHappyVidaPF.Uberaba[cliente.cobertura]['Planos_Odontológicos']})\n`;
+                   mensagem += `• ${item.idade} anos: R$ ${item.valor.toFixed(2)}\n`;
                 }
             });
             Scout.addQuotation();
@@ -274,13 +274,11 @@ class FlowUberabaPF {
                     valorIdade = tabela['59+'];
                 }
                 
-                detalhamento.push({ idade, valor: valorIdade });
-
                 if (cliente.cobertura === 'Completo') {
-                    // Adicional o valor do plano adontológico de cada pessoa no valor total
-                    valorTotal += (valorIdade + tabelaHappyVidaPF.Uberaba[cliente.cobertura]['Planos_Odontológicos']);
+                    valorIdade += tabelaHappyVidaPF.Uberaba[cliente.cobertura]['Planos_Odontológicos']
                 }
 
+                detalhamento.push({ idade, valor: valorIdade });
                 valorTotal += valorIdade;
             }
             
